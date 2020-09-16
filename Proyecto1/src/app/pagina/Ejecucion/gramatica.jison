@@ -165,6 +165,7 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION  {$$ = $1; $$.push($2);}
 ;
 
 INSTRUCCION: CONSOLE                      {$$ = $1;}
+           
 ;
 
 //Console.log
@@ -172,8 +173,8 @@ CONSOLE: TK_CONSOLE '(' EXPRESION ')' ';'       {$$ = new ConsoleLog($3, @1.firs
 ;
 
 //Expresion
-EXPRESION : '-' EXPRESION %prec UMENOS	  { $$ = new Aritmetica($1, null, '-', @1.first_line, @1.first_column); }
-          | '!' EXPRESION	              { $$ = new Aritmetica($1, null, '!', @1.first_line, @1.first_column); }
+EXPRESION : '-' EXPRESION %prec UMENOS	  { $$ = new Aritmetica($2, null, '-', @1.first_line, @1.first_column); }
+          | '!' EXPRESION	              { $$ = new Aritmetica($2, null, '!', @1.first_line, @1.first_column); }
           | EXPRESION '+' EXPRESION		  { $$ = new Aritmetica($1, $3, '+', @1.first_line, @1.first_column); }
           | EXPRESION '-' EXPRESION		  { $$ = new Aritmetica($1, $3, '-', @1.first_line, @1.first_column); }
           | EXPRESION '*' EXPRESION		  { $$ = new Aritmetica($1, $3, '*', @1.first_line, @1.first_column); }
@@ -191,8 +192,8 @@ EXPRESION : '-' EXPRESION %prec UMENOS	  { $$ = new Aritmetica($1, null, '-', @1
           | TK_FALSE				      { $$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, @1.first_line, @1.first_column); }
           | TK_CADENAC			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.replace(/\"/g,""), @1.first_line, @1.first_column); }
           | TK_CADENAS			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.replace(/\'/g,""), @1.first_line, @1.first_column); }
-          /*| TK_ID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }
-          | TK_VOID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }*/
+          | TK_ID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }
+          /*| TK_VOID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }*/
           | '(' EXPRESION ')'		      { $$ = $2; }
 ;
 

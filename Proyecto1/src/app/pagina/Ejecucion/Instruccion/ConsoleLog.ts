@@ -1,6 +1,7 @@
 import { NodoAST } from "../AST/NodoAST";
 import  {Tabla } from "../AST/Tabla";
 import { AST } from "../AST/AST";
+import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 
 /**
@@ -24,7 +25,9 @@ export class ConsoleLog extends NodoAST{
 
     ejecutar(tabla:Tabla, ast:AST){
         const value = this.expresion.ejecutar(tabla, ast);
-        ast.consola.push(value);
+        if(value != null){    
+            ast.consola.push(value);
+        }
         return null;
     }
 }

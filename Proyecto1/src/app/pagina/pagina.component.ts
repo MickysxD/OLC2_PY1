@@ -37,23 +37,29 @@ export class PaginaComponent implements OnInit {
     let ast:AST = parser.parse(entrada);
     let tabla:Tabla= new Tabla(null);
     
+    console.log(ast);    
+
     ast.instrucciones.map((m) =>{
       if(m instanceof ConsoleLog){
         m.ejecutar(tabla, ast);
       }
     });
-    
+
     let a:string = "";
     //console.log(2+2);
-    ast.consola.map((m:any) =>{
+    ast.consola.map((m) =>{
       a += m+"\n";
     });
 
-    var json = JSON.stringify(ast,null,3);
-    console.log(json);
+    ast.errores.map((m) =>{
+      console.log(m.toString());
+    });
+
+    //var json = JSON.stringify(ast,null,3);
+    //console.log(json);
     document.getElementById('txtSalida').innerHTML = a;
+
     //json = json.split('lexema').join('text').split('lista').join('children').split('lista').join('children');
-    
     /*
     var e = (document.getElementById("txtEntrada") as HTMLInputElement).value;
     console.log("entro");

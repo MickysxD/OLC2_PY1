@@ -24,7 +24,7 @@ export class Error{
     }
 
     toString(){
-        return `${this.tipo} ${this.descripcion} ${this.fila} ${this.columna}`;
+        return "Tipo:" + this.tipo + " Descripcion:" + this.descripcion + " Fila:" + this.fila + " Columna:" + this.columna;
     }
 
 }

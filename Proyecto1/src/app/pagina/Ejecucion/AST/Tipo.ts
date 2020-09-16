@@ -28,17 +28,17 @@ export class Tipo{
 
     toString(){
         if(this.tipo === Tipos.BOOLEAN){
-            return 'boolean';
+            return "boolean";
         }else if(this.tipo === Tipos.NUMBER){
-            return 'numeric';
+            return "number";
         }else if(this.tipo === Tipos.STRING){
-            return 'string';
+            return "string";
         }else if(this.tipo === Tipos.VOID){
-            return 'void';
+            return "void";
         }else if(this.tipo === Tipos.TYPE){
-            return 'type';
+            return "type";
         }else if(this.tipo === Tipos.ARRAY){
-            return 'Array';
+            return "Array";
         }
     }
 }
