@@ -1,0 +1,35 @@
+
+<nav class="navbar navbar-light bg-secondary">
+    <div class="container">
+        <a class="navbar-brand " href="#"><h4>MatrioshTS</h4></a>
+    </div>
+    
+</nav>
+
+<div class="card-group p-5" role="group">
+    <div  class="card bg-success">
+        <h4 _ngcontent-srk-c16="" class="list-group-item list-group-item-primary text-center text-success bg-light">Entrada</h4>
+        <div _ngcontent-srk-c16="" class="card-body p-3 mb-2 bg-transparent">
+            <textarea _ngcontent-srk-c16="" id="txtEntrada" rows="15" class="form-control ng-pristine ng-valid ng-touched bg-dark text-light">console.log(2+2);
+                console.log(2+2);
+            </textarea>
+        </div>
+            <button _ngcontent-srk-c16="" (click)="exec()" type="button" id="btnEjecutar" class="btn p-2 mb-1 btn-outline-success btn-lg bg-warning text-light">Ejecutar</button>
+            <button _ngcontent-srk-c16="" type="button" id="tbnTraducir" class="btn p-2 mb-1 btn-outline-success btn-lg bg-info text-light">Traducir</button>
+    </div>
+    <div _ngcontent-srk-c16="" class="card bg-danger">
+        <h4 _ngcontent-srk-c16="" class="list-group-item list-group-item-primary text-center text-danger bg-light">Salida</h4>
+        <div _ngcontent-srk-c16="" class="card-body  bg-secondary btn-lg bg-danger">
+            <textarea _ngcontent-srk-c16="" readonly="" id="txtSalida" rows="15" class="form-control ng-pristine ng-valid ng-touched bg-dark text-light"></textarea>
+        </div>
+            <button _ngcontent-srk-c16="" type="button" id="btnAST" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-primary text-light">AST</button>
+            <button _ngcontent-srk-c16="" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
+
+    </div>
+</div>
+
+<div class="card-group p-5"  role="group">
+    <div  class="card bg-transparent"  id="salidaAST">
+        
+    </div>
+</div>
