@@ -12,10 +12,16 @@
     //Carpeta Expresion
     var {Aritmetica} = require("./Expresion/Aritmetica");
     var {Primitivo} = require("./Expresion/Primitivo");
+    var {Identificador} = require("./Expresion/Identificador");
+    var {Relacional} = require("./Expresion/Relacional");
+    var {Logica} = require("./Expresion/Logica");
     
     
     //Carpeta Instruccion
     var {ConsoleLog} = require("./Instruccion/ConsoleLog");
+    var {Declaracion} = require("./Instruccion/Declaracion");
+    var {Asignacion} = require("./Instruccion/Asignacion");
+    var {If} = require("./Instruccion/If");
 
 
     var errores = [];
@@ -38,7 +44,7 @@
 "boolean"                       return 'TK_BOOLEAN';
 "void"                          return 'TK_VOID';
 "Array"                         return 'TK_ARRAY';
-"type"                         return 'TK_ARRAY';
+"type"                          return 'TK_ARRAY';
 
 
 //Tipos de operadores
@@ -154,47 +160,122 @@ S: INSTRUCCIONES EOF     {$$ = new AST($1, errores); errores = []; return $$;}
  | EOF                   {$$ = new AST([], errores); errores = []; return $$;}
 ;
 
+
 //Deteccion de errores
-ERR: error '}'              {$$ = new Error("Sintactico", $1.yyreport_syntax_error, @1.first_line, @1.first_column);}
-   | error ';'              {$$ = new Error("Sintactico", $1.yyreport_syntax_error, @1.first_line, @1.first_column);}
+ERROR: error '}'              {errores.push(new Error("Sintactico", "Recuperado en: " + $1.yyreport_syntax_error + $1, @2.first_line, @2.first_column));}
+     | error ';'              {errores.push(new Error("Sintactico", "Recuperado en: " + $1.yyreport_syntax_error + $1, @2.first_line, @2.first_column));}
 ;
 
+
 //Comienzo de la lista de instrucciones
-INSTRUCCIONES: INSTRUCCIONES INSTRUCCION  {$$ = $1; $$.push($2);}
-             | INSTRUCCION                {$$ = [$1];}
+INSTRUCCIONES: INSTRUCCIONES INSTRUCCION  { $$ = $1;
+                                            if($2 instanceof NodoAST){
+                                                $$ = $1; $$.push($2);
+                                            }
+                                          }
+             | INSTRUCCION                { if($1 instanceof NodoAST){
+                                                $$ = [$1];
+                                            }else{
+                                                $$ = [];
+                                            }
+                                          }
 ;
 
 INSTRUCCION: CONSOLE                      {$$ = $1;}
-           
+           | DECLARACION                  {$$ = $1;}
+           | ASIGNACION                   {$$ = $1;}
+           | IF                           {$$ = $1;}
+           /*| ERROR                        {$$ = $1;}*/
 ;
+
 
 //Console.log
 CONSOLE: TK_CONSOLE '(' EXPRESION ')' ';'       {$$ = new ConsoleLog($3, @1.first_line, @1.first_column);}
 ;
 
+
+//Declaracion y su listado
+DECLARACION: TK_CONST LISTA_DECLARACION ';'      {$$ = new Declaracion(true, $2);}
+           | TK_LET LISTA_DECLARACION ';'        {$$ = new Declaracion(false, $2);}
+;
+
+LISTA_DECLARACION: LISTA_DECLARACION ',' ID_DECLARACION      {$$ = $1; $$.push($3);}
+                 | ID_DECLARACION                            {$$ = [$1];}
+;
+
+ID_DECLARACION: TK_ID ':' TIPO '=' EXPRESION			     {$$ = new Identificador($1, $3, $5, @1.first_line, @1.first_column);}
+              | TK_ID ':' TIPO			                     {$$ = new Identificador($1, $3, null, @1.first_line, @1.first_column);}
+              | TK_ID '=' EXPRESION                          {$$ = new Identificador($1, null, $3, @1.first_line, @1.first_column);}
+              | TK_ID                                        {$$ = new Identificador($1, null, null, @1.first_line, @1.first_column);}
+;
+
+
+//Asignacion y su listado
+ASIGNACION: LISTA_ASIGNACION ';'                             {$$ = new Asignacion($1);}
+;
+
+LISTA_ASIGNACION: LISTA_ASIGNACION ',' ID_ASIGNACION         {$$ = $1; $$.push($2);}
+                | ID_ASIGNACION                              {$$ = [$1];}
+;
+
+ID_ASIGNACION: TK_ID '=' EXPRESION                           {$$ = new Identificador($1, null, $3, @1.first_line, @1.first_column);}
+;
+
+
+//If y listas
+IF: TK_IF CONDICION BLOQUE_INSTRUCCIONES LISTA_IF TK_ELSE BLOQUE_INSTRUCCIONES  {$$ = new If($2, $3, $4, $6, @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES LISTA_IF                               {$$ = new If($2, $3, $4, null, @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES TK_ELSE BLOQUE_INSTRUCCIONES           {$$ = new If($2, $3, null, $6, @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES                                        {$$ = new If($2, $3, null, null, @1.first_line, @1.first_column);}
+;
+
+CONDICION: '(' EXPRESION ')'        {$$ = $2;}
+;
+
+BLOQUE_INSTRUCCIONES: '{' INSTRUCCIONES '}'                   {$$ = $2;}
+                    | '{' '}'                                 {$$ = [];}
+;
+
+LISTA_IF: LISTA_IF ELSE_IF             {$$ =$1; $$.push($2);}
+        | ELSE_IF                      {$$ = [$1];}
+;
+
+ELSE_IF: TK_ELSE TK_IF CONDICION BLOQUE_INSTRUCCIONES          {$$ = new If($3, $4, null, null, @1.first_line, @1.first_column);}
+;
+
+
+//Tipos de datos de variables y funciones
+TIPO: TK_STRING                                  {$$ = new Tipo(Tipos.STRING);}
+    | TK_BOOLEAN                                 {$$ = new Tipo(Tipos.BOOLEAN);}
+    | TK_NUMBER                                  {$$ = new Tipo(Tipos.NUMBER);}
+;
+
+
 //Expresion
-EXPRESION : '-' EXPRESION %prec UMENOS	  { $$ = new Aritmetica($2, null, '-', @1.first_line, @1.first_column); }
-          | '!' EXPRESION	              { $$ = new Aritmetica($2, null, '!', @1.first_line, @1.first_column); }
-          | EXPRESION '+' EXPRESION		  { $$ = new Aritmetica($1, $3, '+', @1.first_line, @1.first_column); }
-          | EXPRESION '-' EXPRESION		  { $$ = new Aritmetica($1, $3, '-', @1.first_line, @1.first_column); }
-          | EXPRESION '*' EXPRESION		  { $$ = new Aritmetica($1, $3, '*', @1.first_line, @1.first_column); }
-          | EXPRESION '/' EXPRESION	      { $$ = new Aritmetica($1, $3, '/', @1.first_line, @1.first_column); }
-          /*| EXPRESION '<' EXPRESION		  { $$ = new Relational($1, $3, '<', @1.first_line, @1.first_column); }
-          | EXPRESION '>' EXPRESION		  { $$ = new Relational($1, $3, '>', @1.first_line, @1.first_column); }
-          | EXPRESION '>=' EXPRESION	  { $$ = new Relational($1, $3, '>=', @1.first_line, @1.first_column); }
-          | EXPRESION '<=' EXPRESION	  { $$ = new Relational($1, $3, '<=', @1.first_line, @1.first_column); }
-          | EXPRESION '==' EXPRESION	  { $$ = new Relational($1, $3, '==', @1.first_line, @1.first_column); }
-          | EXPRESION '!=' EXPRESION	  { $$ = new Relational($1, $3, '!=', @1.first_line, @1.first_column); }
-          | EXPRESION '||' EXPRESION	  { $$ = new Logic($1, $3, '&&', @1.first_line, @1.first_column); }
-          | EXPRESION '&&' EXPRESION	  { $$ = new Logic($1, $3, '||', @1.first_line, @1.first_column); }*/
-          | TK_NUMERO				      { $$ = new Primitivo(new Tipo(Tipos.NUMBER), Number($1), @1.first_line, @1.first_column); }
-          | TK_TRUE				          { $$ = new Primitivo(new Tipo(Tipos.BOOLEAN), true, @1.first_line, @1.first_column); }
-          | TK_FALSE				      { $$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, @1.first_line, @1.first_column); }
-          | TK_CADENAC			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.replace(/\"/g,""), @1.first_line, @1.first_column); }
-          | TK_CADENAS			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.replace(/\'/g,""), @1.first_line, @1.first_column); }
-          | TK_ID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }
-          /*| TK_VOID			              { $$ = new Identificador($1, @1.first_line, @1.first_column); }*/
-          | '(' EXPRESION ')'		      { $$ = $2; }
+EXPRESION : '-' EXPRESION %prec UMENOS	  {$$ = new Aritmetica($2, null, '-', @1.first_line, @1.first_column);}
+          | EXPRESION '+' EXPRESION		  {$$ = new Aritmetica($1, $3, '+', @1.first_line, @1.first_column);}
+          | EXPRESION '-' EXPRESION		  {$$ = new Aritmetica($1, $3, '-', @1.first_line, @1.first_column);}
+          | EXPRESION '*' EXPRESION		  {$$ = new Aritmetica($1, $3, '*', @1.first_line, @1.first_column);}
+          | EXPRESION '/' EXPRESION	      {$$ = new Aritmetica($1, $3, '/', @1.first_line, @1.first_column);}
+          | EXPRESION '^' EXPRESION	      {$$ = new Aritmetica($1, $3, '^', @1.first_line, @1.first_column);}
+          | EXPRESION '%' EXPRESION	      {$$ = new Aritmetica($1, $3, '%', @1.first_line, @1.first_column);}
+          | EXPRESION '<' EXPRESION		  {$$ = new Relacional($1, $3, '<', @1.first_line, @1.first_column);}
+          | EXPRESION '>' EXPRESION		  {$$ = new Relacional($1, $3, '>', @1.first_line, @1.first_column);}
+          | EXPRESION '>=' EXPRESION	  {$$ = new Relacional($1, $3, '>=', @1.first_line, @1.first_column);}
+          | EXPRESION '<=' EXPRESION	  {$$ = new Relacional($1, $3, '<=', @1.first_line, @1.first_column);}
+          | EXPRESION '==' EXPRESION	  {$$ = new Relacional($1, $3, '==', @1.first_line, @1.first_column);}
+          | EXPRESION '!=' EXPRESION	  {$$ = new Relacional($1, $3, '!=', @1.first_line, @1.first_column);}
+          | '!' EXPRESION	              {$$ = new Logica($2, null, '!', @1.first_line, @1.first_column);}
+          | EXPRESION '||' EXPRESION	  {$$ = new Logica($1, $3, '||', @1.first_line, @1.first_column);}
+          | EXPRESION '&&' EXPRESION	  {$$ = new Logica($1, $3, '&&', @1.first_line, @1.first_column);}
+          | TK_NUMERO				      {$$ = new Primitivo(new Tipo(Tipos.NUMBER), Number($1), @1.first_line, @1.first_column);}
+          | TK_TRUE				          {$$ = new Primitivo(new Tipo(Tipos.BOOLEAN), true, @1.first_line, @1.first_column);}
+          | TK_FALSE				      {$$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, @1.first_line, @1.first_column);}
+          | TK_CADENAC			          {$$ = new Primitivo(new Tipo(Tipos.STRING), $1.slice(1, -1).replace(/\\"/g,"\""), @1.first_line, @1.first_column);}
+          | TK_CADENAS			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.slice(1, -1).replace(/\\'/g,"'"), @1.first_line, @1.first_column);}
+          | TK_ID			              {$$ = new Identificador($1, null, null, @1.first_line, @1.first_column);}
+          /*| TK_VOID			              {$$ = new Identificador($1, @1.first_line, @1.first_column);}*/
+          | '(' EXPRESION ')'		      {$$ = $2;}
 ;
 
 /*

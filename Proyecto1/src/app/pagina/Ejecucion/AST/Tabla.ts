@@ -24,15 +24,15 @@ export class Tabla{
      * @param simbol Simbolo que contiene la informacion de la variable a almacenar
      */
 
-    setVariable(simbolo: Simbolo){
-        let env: Tabla;
-        for(env = this; env != null; env = env.anterior){
-            for(let key of Array.from( env.variables.keys()) ) {
-                if(key === simbolo.id){
-                    return `La variable ${key} ya ha sido declarada.`;
-                }
+    setVariable(simbolo:Simbolo){
+        let env:Tabla=this;
+        //for(env = this; env != null; env = env.anterior){
+        for(let key of Array.from( env.variables.keys()) ) {
+            if(key == simbolo.id){
+                return "La variable " + key + " ya ha sido declarada";
             }
         }
+        //}
         this.variables.set(simbolo.id, simbolo);
         return null;
     }
@@ -48,7 +48,7 @@ export class Tabla{
         let env:Tabla;
         for(env = this; env != null; env = env.anterior){
             for(let key of Array.from(env.variables.keys())) {
-                if(key === id){
+                if(key == id){
                     return env.variables.get(key);
                 }
             }
@@ -56,4 +56,5 @@ export class Tabla{
         return null;
     }
 
+   
 }

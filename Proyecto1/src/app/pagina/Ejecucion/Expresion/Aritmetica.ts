@@ -31,91 +31,122 @@ export class Aritmetica extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST) {
-        if (this.derecho != null) {
+        if(this.derecho != null){
             const operacionIzq = this.izquierdo.ejecutar(tabla, ast);
-            if (operacionIzq instanceof Error) {
+            if(operacionIzq instanceof Error){
                 return operacionIzq;
             }
             const operacionDer = this.derecho.ejecutar(tabla, ast);
-            if (operacionDer instanceof Error) {
+            if(operacionDer instanceof Error){
                 return operacionDer;
             }
 
-            if (this.operacion == '+') {
-                if (this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER) {
+            if(this.operacion == '+'){
+                if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
                     return operacionIzq + operacionDer;
-                } else if (this.izquierdo.tipo.tipo == Tipos.STRING || this.derecho.tipo.tipo == Tipos.STRING) {
+                }else if(this.izquierdo.tipo.tipo == Tipos.STRING || this.derecho.tipo.tipo == Tipos.STRING){
                     this.tipo = new Tipo(Tipos.STRING);
                     return operacionIzq + operacionDer;
-                } else {
+                }else{
                     const error = new Error("Semantico", "Error de Tipos -> se esta tratando de sumar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
                     //ast.consola.push(error.toString());
-                    return null;
+                    return error;
                 }
-            } else if (this.operacion == '-') {
-                if (this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER) {
+            }else if(this.operacion == '-'){
+                if (this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
                     return operacionIzq - operacionDer;
-                } else {
-                    const error = new Error("Semantico", "Error de Tipos en la resta se esta tratando de operar" + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                }else{
+                    const error = new Error("Semantico", "Error de Tipos -> se esta tratando de restar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
                     //ast.consola.push(error.toString());
-                    return null;
+                    return error;
                 }
-            } else if (this.operacion == '*') {
-                if (this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER) {
+            }else if(this.operacion == '*'){
+                if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
                     return operacionIzq * operacionDer;
-                } else {
-                    const error = new Error("Semantico","Error de Tipos en la multiplicacion se esta tratando de operar" + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                }else{
+                    const error = new Error("Semantico","Error de Tipos -> se esta tratando de multiplicar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
                     //ast.consola.push(error.toString());
-                    return null;
+                    return error;
                 }
-            } else if (this.operacion == '/') {
-                if (this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER) {
+            }else if(this.operacion == '/'){
+                if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
-                    if (operacionDer == 0) {
-                        const error = new Error("Semantico", "Error aritmetico, La division con cero no esta permitida", this.fila, this.columna);
+                    if(operacionDer == 0){
+                        const error = new Error("Semantico", "Error aritmetico -> se esta tratando de dividir entre cero ", this.fila, this.columna);
                         ast.errores.push(error);
                         //ast.consola.push(error.toString());
-                        return null;
+                        return error;
                     }
                     return operacionIzq / operacionDer;
-                } else {
-                    const error = new Error("Semantico", "Error de Tipos en la division se esta tratando de operar" + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                }else{
+                    const error = new Error("Semantico", "Error de Tipos -> se esta tratando de dividir " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
                     //ast.consola.push(error.toString());
-                    return null;
+                    return error;
                 }
-            } else {
+            }else if(this.operacion == '^'){
+                if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
+                    this.tipo = new Tipo(Tipos.NUMBER);
+                    if(operacionDer == 0){
+                        return 1;
+                    }else{
+                        let numero = operacionIzq;
+                        for (let index = 0; index < operacionDer-1; index++) {
+                            numero = numero*operacionIzq;   
+                        }
+                        return numero;
+                    }
+                    //return operacionIzq ^ operacionDer;
+                }else{
+                    const error = new Error("Semantico","Error de Tipos -> se esta tratando de elevar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+            }else if(this.operacion == '%'){
+                if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
+                    this.tipo = new Tipo(Tipos.NUMBER);
+                    return operacionIzq % operacionDer;
+                }else{
+                    const error = new Error("Semantico","Error de Tipos -> se esta tratando de obtener el modulo " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+            }else{
                 const error = new Error("Semantico", "Error, Operador desconocido", this.fila, this.columna);
                 ast.errores.push(error);
                 //ast.consola.push(error.toString());
-                return null;
+                return error;
             }
-        } else {
+
+        }else{
             const operacionIzq = this.izquierdo.ejecutar(tabla, ast);
-            if (operacionIzq instanceof Error) {
+            if(operacionIzq instanceof Error){
                 return operacionIzq;
             }
-            if (this.operacion == '-') {
-                if (this.izquierdo.tipo.tipo == Tipos.NUMBER) {
+            
+            if(this.operacion == '-'){
+                if (this.izquierdo.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
                     return -1*operacionIzq;
-                } else {
-                    const error = new Error("Semantico", "Error de Tipos en el operador unario se esta tratando de operar " + this.izquierdo.tipo.toString(), this.fila, this.columna);
+                }else{
+                    const error = new Error("Semantico", "Error de Tipos -> el operador unario tratando de operar " + this.izquierdo.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
                     //ast.consola.push(error.toString());
-                    return null;
+                    return error;
                 }
-            } else {
-                const error = new Error("Semantico", "Error, Operador desconocido", this.fila, this.columna);
+            }else{
+                const error = new Error("Semantico", "Error -> Operador desconocido", this.fila, this.columna);
                 ast.errores.push(error);
                 //ast.consola.push(error.toString());
-                return null;
+                return error;
             }
         }
     }

@@ -25,7 +25,7 @@ export class ConsoleLog extends NodoAST{
 
     ejecutar(tabla:Tabla, ast:AST){
         const value = this.expresion.ejecutar(tabla, ast);
-        if(value != null){    
+        if(!(value instanceof Error)){    
             ast.consola.push(value);
         }
         return null;

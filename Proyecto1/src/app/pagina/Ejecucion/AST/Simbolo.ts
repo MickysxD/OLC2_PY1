@@ -6,8 +6,9 @@ import { Tipo } from "./Tipo";
 
 export class Simbolo{
     tipo:Tipo;
-    id:string
-    valor:Object
+    id:string;
+    valor:Object;
+    constante:boolean;
 
     /**
      * @constructor Para crear un nuevo simbolo a utilizar en una tabla de simbolos o funciones
@@ -16,9 +17,10 @@ export class Simbolo{
      * @param value Valor de la variable u objeto completo de la función
      */
 
-    constructor(tipo:Tipo, id:string, valor:Object) {
+    constructor(tipo:Tipo, id:string, valor:Object, constante:boolean) {
         this.tipo = tipo;
         this.id = id;
         this.valor = valor;
+        this.constante = constante;
     }
 }
