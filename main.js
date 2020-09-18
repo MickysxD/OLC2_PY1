@@ -62,6 +62,59 @@ module.exports = __webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git
 
 /***/ }),
 
+/***/ "Afb6":
+/*!*************************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Expresion/Identificador.ts ***!
+  \*************************************************************/
+/*! exports provided: Identificador */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Identificador", function() { return Identificador; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+
+
+/**
+ * @class Nodo expresion identificador que obtendra el valor de una variable
+ */
+class Identificador extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Retorna el objeto identificador creado
+     * @param identifier nombre de la variable
+     * @param line Linea del identificador
+     * @param column Columna del identificador
+     */
+    constructor(identificador, tipo, valor, fila, columna) {
+        //tipo null porque aun no se el tipo
+        super(tipo, fila, columna);
+        this.identificador = identificador;
+        this.valor = valor;
+    }
+    ejecutar(tabla, ast) {
+        let variable;
+        variable = tabla.getVariable(this.identificador);
+        if (variable == null) {
+            const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se ha encontrado la variable " + this.identificador, this.fila, this.columna);
+            ast.errores.push(error);
+            //ast.consola.push(error.toString());
+            return error;
+        }
+        else if (variable.valor == null) {
+            const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Variable no inicializada " + this.identificador, this.fila, this.columna);
+            ast.errores.push(error);
+            //ast.consola.push(error.toString());
+            return error;
+        }
+        this.tipo = variable.tipo;
+        return variable.valor;
+    }
+}
+
+
+/***/ }),
+
 /***/ "AytR":
 /*!*****************************************!*\
   !*** ./src/environments/environment.ts ***!
@@ -101,7 +154,9 @@ const environment = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConsoleLog", function() { return ConsoleLog; });
 /* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
-/* harmony import */ var _AST_Tipo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Tipo */ "EsxH");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AST/Tipo */ "EsxH");
+
 
 
 /**
@@ -115,12 +170,14 @@ class ConsoleLog extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
      * @param column Columna donde se creo la sentencia
      */
     constructor(expresion, fila, columna) {
-        super(new _AST_Tipo__WEBPACK_IMPORTED_MODULE_1__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_1__["Tipos"].VOID), fila, columna);
+        super(new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].VOID), fila, columna);
         this.expresion = expresion;
     }
     ejecutar(tabla, ast) {
         const value = this.expresion.ejecutar(tabla, ast);
-        ast.consola.push(value);
+        if (!(value instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"])) {
+            ast.consola.push(value);
+        }
         return null;
     }
 }
@@ -164,22 +221,22 @@ class Tipo {
     }
     toString() {
         if (this.tipo === Tipos.BOOLEAN) {
-            return 'boolean';
+            return "boolean";
         }
         else if (this.tipo === Tipos.NUMBER) {
-            return 'numeric';
+            return "number";
         }
         else if (this.tipo === Tipos.STRING) {
-            return 'string';
+            return "string";
         }
         else if (this.tipo === Tipos.VOID) {
-            return 'void';
+            return "void";
         }
         else if (this.tipo === Tipos.TYPE) {
-            return 'type';
+            return "type";
         }
         else if (this.tipo === Tipos.ARRAY) {
-            return 'Array';
+            return "Array";
         }
     }
 }
@@ -268,12 +325,12 @@ class Tipo {
   }
 */
 var gramatica = (function(){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,6],$V1=[5,11],$V2=[1,18],$V3=[1,11],$V4=[1,12],$V5=[1,13],$V6=[1,14],$V7=[1,15],$V8=[1,16],$V9=[1,17],$Va=[1,21],$Vb=[1,20],$Vc=[1,22],$Vd=[1,23],$Ve=[14,15,17,18,19],$Vf=[14,15,17];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,9],$V1=[1,10],$V2=[1,11],$V3=[1,15],$V4=[1,13],$V5=[5,7,14,18,20,23,29],$V6=[1,21],$V7=[1,26],$V8=[8,21],$V9=[1,37],$Va=[1,36],$Vb=[1,29],$Vc=[1,30],$Vd=[1,31],$Ve=[1,32],$Vf=[1,33],$Vg=[1,34],$Vh=[1,35],$Vi=[1,39],$Vj=[1,45],$Vk=[1,50],$Vl=[1,49],$Vm=[1,51],$Vn=[1,52],$Vo=[1,53],$Vp=[1,54],$Vq=[1,55],$Vr=[1,56],$Vs=[1,57],$Vt=[1,58],$Vu=[1,59],$Vv=[1,60],$Vw=[1,61],$Vx=[1,62],$Vy=[8,17,21,39,40,41,42,43,44,45,46,47,48,49,50,52,53],$Vz=[8,21,26],$VA=[1,98],$VB=[5,7,14,18,20,23,29,33],$VC=[8,17,21,39,40,45,46,47,48,49,50,52,53],$VD=[8,17,21,39,40,41,42,45,46,47,48,49,50,52,53],$VE=[8,17,21,45,46,47,48,49,50,52,53],$VF=[8,17,21,49,50,52,53];
 var parser = {trace: function trace () { },
 yy: {},
-symbols_: {"error":2,"S":3,"INSTRUCCIONES":4,"EOF":5,"ERR":6,"}":7,";":8,"INSTRUCCION":9,"CONSOLE":10,"TK_CONSOLE":11,"(":12,"EXPRESION":13,")":14,"-":15,"!":16,"+":17,"*":18,"/":19,"TK_NUMERO":20,"TK_TRUE":21,"TK_FALSE":22,"TK_CADENAC":23,"TK_CADENAS":24,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"}",8:";",11:"TK_CONSOLE",12:"(",14:")",15:"-",16:"!",17:"+",18:"*",19:"/",20:"TK_NUMERO",21:"TK_TRUE",22:"TK_FALSE",23:"TK_CADENAC",24:"TK_CADENAS"},
-productions_: [0,[3,2],[3,1],[6,2],[6,2],[4,2],[4,1],[9,1],[10,5],[13,2],[13,2],[13,3],[13,3],[13,3],[13,3],[13,1],[13,1],[13,1],[13,1],[13,1],[13,3]],
+symbols_: {"error":2,"S":3,"INSTRUCCIONES":4,"EOF":5,"ERROR":6,"}":7,";":8,"INSTRUCCION":9,"CONSOLE":10,"DECLARACION":11,"ASIGNACION":12,"IF":13,"TK_CONSOLE":14,"(":15,"EXPRESION":16,")":17,"TK_CONST":18,"LISTA_DECLARACION":19,"TK_LET":20,",":21,"ID_DECLARACION":22,"TK_ID":23,":":24,"TIPO":25,"=":26,"LISTA_ASIGNACION":27,"ID_ASIGNACION":28,"TK_IF":29,"CONDICION":30,"BLOQUE_INSTRUCCIONES":31,"LISTA_IF":32,"TK_ELSE":33,"{":34,"ELSE_IF":35,"TK_STRING":36,"TK_BOOLEAN":37,"TK_NUMBER":38,"-":39,"+":40,"*":41,"/":42,"^":43,"%":44,"<":45,">":46,">=":47,"<=":48,"==":49,"!=":50,"!":51,"||":52,"&&":53,"TK_NUMERO":54,"TK_TRUE":55,"TK_FALSE":56,"TK_CADENAC":57,"TK_CADENAS":58,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"}",8:";",14:"TK_CONSOLE",15:"(",17:")",18:"TK_CONST",20:"TK_LET",21:",",23:"TK_ID",24:":",26:"=",29:"TK_IF",33:"TK_ELSE",34:"{",36:"TK_STRING",37:"TK_BOOLEAN",38:"TK_NUMBER",39:"-",40:"+",41:"*",42:"/",43:"^",44:"%",45:"<",46:">",47:">=",48:"<=",49:"==",50:"!=",51:"!",52:"||",53:"&&",54:"TK_NUMERO",55:"TK_TRUE",56:"TK_FALSE",57:"TK_CADENAC",58:"TK_CADENAS"},
+productions_: [0,[3,2],[3,1],[6,2],[6,2],[4,2],[4,1],[9,1],[9,1],[9,1],[9,1],[10,5],[11,3],[11,3],[19,3],[19,1],[22,5],[22,3],[22,3],[22,1],[12,2],[27,3],[27,1],[28,3],[13,6],[13,4],[13,5],[13,3],[30,3],[31,3],[31,2],[32,2],[32,1],[35,4],[25,1],[25,1],[25,1],[16,2],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,3],[16,2],[16,3],[16,3],[16,1],[16,1],[16,1],[16,1],[16,1],[16,1],[16,3]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -286,60 +343,159 @@ case 2:
 this.$ = new AST([], errores); errores = []; return this.$;
 break;
 case 3: case 4:
-this.$ = new Error("Sintactico", $$[$0-1].yyreport_syntax_error, _$[$0-1].first_line, _$[$0-1].first_column);
+errores.push(new Error("Sintactico", "Recuperado en: " + $$[$0-1].yyreport_syntax_error + $$[$0-1], _$[$0].first_line, _$[$0].first_column));
 break;
 case 5:
-this.$ = $$[$0-1]; this.$.push($$[$0]);
+ this.$ = $$[$0-1];
+                                            if($$[$0] instanceof NodoAST){
+                                                this.$ = $$[$0-1]; this.$.push($$[$0]);
+                                            }
+                                          
 break;
 case 6:
-this.$ = [$$[$0]];
+ if($$[$0] instanceof NodoAST){
+                                                this.$ = [$$[$0]];
+                                            }else{
+                                                this.$ = [];
+                                            }
+                                          
 break;
-case 7:
+case 7: case 8: case 9: case 10:
 this.$ = $$[$0];
 break;
-case 8:
+case 11:
 this.$ = new ConsoleLog($$[$0-2], _$[$0-4].first_line, _$[$0-4].first_column);
 break;
-case 9:
- this.$ = new Aritmetica($$[$0-1], null, '-', _$[$0-1].first_line, _$[$0-1].first_column); 
-break;
-case 10:
- this.$ = new Aritmetica($$[$0-1], null, '!', _$[$0-1].first_line, _$[$0-1].first_column); 
-break;
-case 11:
- this.$ = new Aritmetica($$[$0-2], $$[$0], '+', _$[$0-2].first_line, _$[$0-2].first_column); 
-break;
 case 12:
- this.$ = new Aritmetica($$[$0-2], $$[$0], '-', _$[$0-2].first_line, _$[$0-2].first_column); 
+this.$ = new Declaracion(true, $$[$0-1]);
 break;
 case 13:
- this.$ = new Aritmetica($$[$0-2], $$[$0], '*', _$[$0-2].first_line, _$[$0-2].first_column); 
+this.$ = new Declaracion(false, $$[$0-1]);
 break;
 case 14:
- this.$ = new Aritmetica($$[$0-2], $$[$0], '/', _$[$0-2].first_line, _$[$0-2].first_column); 
+this.$ = $$[$0-2]; this.$.push($$[$0]);
 break;
-case 15:
- this.$ = new Primitivo(new Tipo(Tipos.NUMBER), Number($$[$0]), _$[$0].first_line, _$[$0].first_column); 
+case 15: case 22: case 32:
+this.$ = [$$[$0]];
 break;
 case 16:
- this.$ = new Primitivo(new Tipo(Tipos.BOOLEAN), true, _$[$0].first_line, _$[$0].first_column); 
+this.$ = new Identificador($$[$0-4], $$[$0-2], $$[$0], _$[$0-4].first_line, _$[$0-4].first_column);
 break;
 case 17:
- this.$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, _$[$0].first_line, _$[$0].first_column); 
+this.$ = new Identificador($$[$0-2], $$[$0], null, _$[$0-2].first_line, _$[$0-2].first_column);
 break;
-case 18:
- this.$ = new Primitivo(new Tipo(Tipos.STRING), $$[$0].replace(/\"/g,""), _$[$0].first_line, _$[$0].first_column); 
+case 18: case 23:
+this.$ = new Identificador($$[$0-2], null, $$[$0], _$[$0-2].first_line, _$[$0-2].first_column);
 break;
-case 19:
- this.$ = new Primitivo(new Tipo(Tipos.STRING), $$[$0].replace(/\'/g,""), _$[$0].first_line, _$[$0].first_column); 
+case 19: case 58:
+this.$ = new Identificador($$[$0], null, null, _$[$0].first_line, _$[$0].first_column);
 break;
 case 20:
- this.$ = $$[$0-1]; 
+this.$ = new Asignacion($$[$0-1]);
+break;
+case 21:
+this.$ = $$[$0-2]; this.$.push($$[$0-1]);
+break;
+case 24:
+this.$ = new If($$[$0-4], $$[$0-3], $$[$0-2], $$[$0], _$[$0-5].first_line, _$[$0-5].first_column);
+break;
+case 25:
+this.$ = new If($$[$0-2], $$[$0-1], $$[$0], null, _$[$0-3].first_line, _$[$0-3].first_column);
+break;
+case 26:
+this.$ = new If($$[$0-3], $$[$0-2], null, $$[$01], _$[$0-4].first_line, _$[$0-4].first_column);
+break;
+case 27:
+this.$ = new If($$[$0-1], $$[$0], null, null, _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 28: case 29: case 59:
+this.$ = $$[$0-1];
+break;
+case 30:
+this.$ = [];
+break;
+case 31:
+this.$ =$$[$0-1]; this.$.push($$[$0]);
+break;
+case 33:
+this.$ = new If($$[$0-1], $$[$0], null, null, _$[$0-3].first_line, _$[$0-3].first_column);
+break;
+case 34:
+this.$ = new Tipo(Tipos.STRING);
+break;
+case 35:
+this.$ = new Tipo(Tipos.BOOLEAN);
+break;
+case 36:
+this.$ = new Tipo(Tipos.NUMBER);
+break;
+case 37:
+this.$ = new Aritmetica($$[$0], null, '-', _$[$0-1].first_line, _$[$0-1].first_column);
+break;
+case 38:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '+', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 39:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '-', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 40:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '*', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 41:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '/', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 42:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '^', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 43:
+this.$ = new Aritmetica($$[$0-2], $$[$0], '%', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 44:
+this.$ = new Relacional($$[$0-2], $$[$0], '<', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 45:
+this.$ = new Relacional($$[$0-2], $$[$0], '>', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 46:
+this.$ = new Relacional($$[$0-2], $$[$0], '>=', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 47:
+this.$ = new Relacional($$[$0-2], $$[$0], '<=', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 48:
+this.$ = new Relacional($$[$0-2], $$[$0], '==', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 49:
+this.$ = new Relacional($$[$0-2], $$[$0], '!=', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 50:
+this.$ = new Logica($$[$0], null, '!', _$[$0-1].first_line, _$[$0-1].first_column);
+break;
+case 51:
+this.$ = new Logica($$[$0-2], $$[$0], '||', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 52:
+this.$ = new Logica($$[$0-2], $$[$0], '&&', _$[$0-2].first_line, _$[$0-2].first_column);
+break;
+case 53:
+this.$ = new Primitivo(new Tipo(Tipos.NUMBER), Number($$[$0]), _$[$0].first_line, _$[$0].first_column);
+break;
+case 54:
+this.$ = new Primitivo(new Tipo(Tipos.BOOLEAN), true, _$[$0].first_line, _$[$0].first_column);
+break;
+case 55:
+this.$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, _$[$0].first_line, _$[$0].first_column);
+break;
+case 56:
+this.$ = new Primitivo(new Tipo(Tipos.STRING), $$[$0].slice(1, -1).replace(/\\"/g,"\""), _$[$0].first_line, _$[$0].first_column);
+break;
+case 57:
+ this.$ = new Primitivo(new Tipo(Tipos.STRING), $$[$0].slice(1, -1).replace(/\\'/g,"'"), _$[$0].first_line, _$[$0].first_column);
 break;
 }
 },
-table: [{3:1,4:2,5:[1,3],9:4,10:5,11:$V0},{1:[3]},{5:[1,7],9:8,10:5,11:$V0},{1:[2,2]},o($V1,[2,6]),o($V1,[2,7]),{12:[1,9]},{1:[2,1]},o($V1,[2,5]),{12:$V2,13:10,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{14:[1,19],15:$Va,17:$Vb,18:$Vc,19:$Vd},{12:$V2,13:24,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{12:$V2,13:25,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},o($Ve,[2,15]),o($Ve,[2,16]),o($Ve,[2,17]),o($Ve,[2,18]),o($Ve,[2,19]),{12:$V2,13:26,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{8:[1,27]},{12:$V2,13:28,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{12:$V2,13:29,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{12:$V2,13:30,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},{12:$V2,13:31,15:$V3,16:$V4,20:$V5,21:$V6,22:$V7,23:$V8,24:$V9},o($Ve,[2,9]),o($Ve,[2,10]),{14:[1,32],15:$Va,17:$Vb,18:$Vc,19:$Vd},o($V1,[2,8]),o($Vf,[2,11],{18:$Vc,19:$Vd}),o($Vf,[2,12],{18:$Vc,19:$Vd}),o($Ve,[2,13]),o($Ve,[2,14]),o($Ve,[2,20])],
-defaultActions: {3:[2,2],7:[2,1]},
+table: [{3:1,4:2,5:[1,3],9:4,10:5,11:6,12:7,13:8,14:$V0,18:$V1,20:$V2,23:$V3,27:12,28:14,29:$V4},{1:[3]},{5:[1,16],9:17,10:5,11:6,12:7,13:8,14:$V0,18:$V1,20:$V2,23:$V3,27:12,28:14,29:$V4},{1:[2,2]},o($V5,[2,6]),o($V5,[2,7]),o($V5,[2,8]),o($V5,[2,9]),o($V5,[2,10]),{15:[1,18]},{19:19,22:20,23:$V6},{19:22,22:20,23:$V6},{8:[1,23],21:[1,24]},{15:$V7,30:25},o($V8,[2,22]),{26:[1,27]},{1:[2,1]},o($V5,[2,5]),{15:$V9,16:28,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{8:[1,38],21:$Vi},o($V8,[2,15]),o($V8,[2,19],{24:[1,40],26:[1,41]}),{8:[1,42],21:$Vi},o($V5,[2,20]),{23:$V3,28:43},{31:44,34:$Vj},{15:$V9,16:46,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:47,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{17:[1,48],39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx},{15:$V9,16:63,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:64,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},o($Vy,[2,53]),o($Vy,[2,54]),o($Vy,[2,55]),o($Vy,[2,56]),o($Vy,[2,57]),o($Vy,[2,58]),{15:$V9,16:65,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},o($V5,[2,12]),{22:66,23:$V6},{25:67,36:[1,68],37:[1,69],38:[1,70]},{15:$V9,16:71,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},o($V5,[2,13]),o($V8,[2,21]),o($V5,[2,27],{32:72,35:74,33:[1,73]}),{4:75,7:[1,76],9:4,10:5,11:6,12:7,13:8,14:$V0,18:$V1,20:$V2,23:$V3,27:12,28:14,29:$V4},{17:[1,77],39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx},o($V8,[2,23],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx}),{8:[1,78]},{15:$V9,16:79,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:80,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:81,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:82,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:83,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:84,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:85,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:86,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:87,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:88,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:89,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:90,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:91,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{15:$V9,16:92,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},o($Vy,[2,37]),o($Vy,[2,50]),{17:[1,93],39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx},o($V8,[2,14]),o($V8,[2,17],{26:[1,94]}),o($Vz,[2,34]),o($Vz,[2,35]),o($Vz,[2,36]),o($V8,[2,18],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx}),o($V5,[2,25],{35:96,33:[1,95]}),{29:$VA,31:97,34:$Vj},o($VB,[2,32]),{7:[1,99],9:17,10:5,11:6,12:7,13:8,14:$V0,18:$V1,20:$V2,23:$V3,27:12,28:14,29:$V4},o($VB,[2,30]),{34:[2,28]},o($V5,[2,11]),o($VC,[2,38],{41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VC,[2,39],{41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VD,[2,40],{43:$Vo,44:$Vp}),o($VD,[2,41],{43:$Vo,44:$Vp}),o($Vy,[2,42]),o($Vy,[2,43]),o($VE,[2,44],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VE,[2,45],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VE,[2,46],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VE,[2,47],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp}),o($VF,[2,48],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt}),o($VF,[2,49],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt}),o([8,17,21,52],[2,51],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,53:$Vx}),o([8,17,21,52,53],[2,52],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv}),o($Vy,[2,59]),{15:$V9,16:100,23:$Va,39:$Vb,51:$Vc,54:$Vd,55:$Ve,56:$Vf,57:$Vg,58:$Vh},{29:$VA,31:101,34:$Vj},o($VB,[2,31]),o($V5,[2,26]),{15:$V7,30:102},o($VB,[2,29]),o($V8,[2,16],{39:$Vk,40:$Vl,41:$Vm,42:$Vn,43:$Vo,44:$Vp,45:$Vq,46:$Vr,47:$Vs,48:$Vt,49:$Vu,50:$Vv,52:$Vw,53:$Vx}),o($V5,[2,24]),{31:103,34:$Vj},o($VB,[2,33])],
+defaultActions: {3:[2,2],16:[2,1],77:[2,28]},
 parseError: function parseError (str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -600,10 +756,16 @@ _handle_error:
     //Carpeta Expresion
     var {Aritmetica} = __webpack_require__(/*! ./Expresion/Aritmetica */ "UO5A");
     var {Primitivo} = __webpack_require__(/*! ./Expresion/Primitivo */ "LRvX");
+    var {Identificador} = __webpack_require__(/*! ./Expresion/Identificador */ "Afb6");
+    var {Relacional} = __webpack_require__(/*! ./Expresion/Relacional */ "LqoN");
+    var {Logica} = __webpack_require__(/*! ./Expresion/Logica */ "lcmB");
     
     
     //Carpeta Instruccion
     var {ConsoleLog} = __webpack_require__(/*! ./Instruccion/ConsoleLog */ "BLdb");
+    var {Declaracion} = __webpack_require__(/*! ./Instruccion/Declaracion */ "NP5J");
+    var {Asignacion} = __webpack_require__(/*! ./Instruccion/Asignacion */ "WLoS");
+    var {If} = __webpack_require__(/*! ./Instruccion/If */ "Ipbx");
 
 
     var errores = [];
@@ -939,11 +1101,11 @@ case 0:return 'TK_CL';
 break;
 case 1:return 'TK_CM';
 break;
-case 2:return 'TK_STRING';
+case 2:return 36;
 break;
-case 3:return 'TK_NUMBER';
+case 3:return 38;
 break;
-case 4:return 'TK_BOOLEAN';
+case 4:return 37;
 break;
 case 5:return 'TK_VOID';
 break;
@@ -955,59 +1117,59 @@ case 8:return '++';
 break;
 case 9:return '--';
 break;
-case 10:return 17;
+case 10:return 40;
 break;
-case 11:return 15;
+case 11:return 39;
 break;
-case 12:return 18;
+case 12:return 41;
 break;
-case 13:return 19;
+case 13:return 42;
 break;
-case 14:return '^';
+case 14:return 43;
 break;
-case 15:return '%';
+case 15:return 44;
 break;
-case 16:return '==';
+case 16:return 49;
 break;
-case 17:return '!=';
+case 17:return 50;
 break;
-case 18:return '>=';
+case 18:return 47;
 break;
-case 19:return '>';
+case 19:return 46;
 break;
-case 20:return '<=';
+case 20:return 48;
 break;
-case 21:return '<';
+case 21:return 45;
 break;
-case 22:return '&&';
+case 22:return 53;
 break;
-case 23:return '||';
+case 23:return 52;
 break;
-case 24:return 16;
+case 24:return 51;
 break;
-case 25:return 12;
+case 25:return 15;
 break;
-case 26:return 14;
+case 26:return 17;
 break;
-case 27:return '{';
+case 27:return 34;
 break;
 case 28:return 7;
 break;
 case 29:return 8;
 break;
-case 30:return ':';
+case 30:return 24;
 break;
-case 31:return ',';
+case 31:return 21;
 break;
-case 32:return '=';
+case 32:return 26;
 break;
 case 33:return '.';
 break;
 case 34:return 'TK_FUNCTION';
 break;
-case 35:return 'TK_IF';
+case 35:return 29;
 break;
-case 36:return 'TK_ELSE';
+case 36:return 33;
 break;
 case 37:return 'TK_SWITCH';
 break;
@@ -1037,25 +1199,25 @@ case 49:return 'TK_POP';
 break;
 case 50:return 'TK_LENGTH';
 break;
-case 51:return 'TK_LET';
+case 51:return 20;
 break;
-case 52:return 'TK_CONST';
+case 52:return 18;
 break;
-case 53:return 11;
+case 53:return 14;
 break;
 case 54:return 'TK_GRAFICAR';
 break;
-case 55:return 21;
+case 55:return 55;
 break;
-case 56:return 22;
+case 56:return 56;
 break;
-case 57:return 23;
+case 57:return 57;
 break;
-case 58:return 'TK_ID';
+case 58:return 23;
 break;
-case 59:return 20;
+case 59:return 54;
 break;
-case 60:return 24;
+case 60:return 58;
 break;
 case 61:
 break;
@@ -1096,6 +1258,101 @@ if ( true && __webpack_require__.c[__webpack_require__.s] === module) {
 }
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../node_modules/webpack/buildin/module.js */ "YuTi")(module)))
+
+/***/ }),
+
+/***/ "Ipbx":
+/*!****************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Instruccion/If.ts ***!
+  \****************************************************/
+/*! exports provided: If */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "If", function() { return If; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Tabla */ "fK0c");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _AST_Tipo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../AST/Tipo */ "EsxH");
+
+
+
+
+/*
+import { Continue } from "../Expresiones/Continue";
+import { Break } from "../Expresiones/Break";*/
+/**
+ * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
+ */
+class If extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Crea el nodo instruccion para la sentencia IF
+     * @param condicion Condicion que debe ser tipo boolean
+     * @param listaIFS Lista de instrucciones a ejecutar en caso la condicion sea verdadera
+     * @param sentenciasELSE Lista de instrucciones a ejecutar en caso la condicion sea falsa
+     * @param fila filaa de la sentencia if
+     * @param columna columnaa de la sentencia if
+     */
+    constructor(condicion, sentenciasIF, listaIFS, sentenciasELSE, fila, columna) {
+        super(null, fila, columna);
+        this.condicion = condicion;
+        this.sentenciasIF = sentenciasIF;
+        this.listaIFS = listaIFS;
+        this.sentenciasELSE = sentenciasELSE;
+        this.entro = null;
+    }
+    ejecutar(tabla, ast) {
+        const nuevoEntorno = new _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](tabla);
+        let result;
+        result = this.condicion.ejecutar(nuevoEntorno, ast);
+        if (result instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]) {
+            return result;
+        }
+        if (this.condicion.tipo.tipo != _AST_Tipo__WEBPACK_IMPORTED_MODULE_3__["Tipos"].BOOLEAN) {
+            const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
+            ast.errores.push(error);
+            //ast.consola.push(error.toString());
+            return error;
+        }
+        if (result) {
+            if (this.sentenciasIF != null) {
+                this.sentenciasIF.map((m) => {
+                    m.ejecutar(nuevoEntorno, ast);
+                    //if(res instanceof Continue || res instanceof Break){
+                    //    return null;
+                    //}
+                });
+                this.entro = true;
+            }
+        }
+        else {
+            if (this.listaIFS != null) {
+                this.listaIFS.map((m) => {
+                    const res = m.ejecutar(nuevoEntorno, ast);
+                    if (m.entro) {
+                        this.entro = true;
+                        return null;
+                    }
+                    if (res instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]) {
+                        return res;
+                    }
+                });
+            }
+            if (this.sentenciasELSE != null && !this.entro) {
+                this.sentenciasELSE.map((m) => {
+                    const res = m.ejecutar(nuevoEntorno, ast);
+                    //if(res instanceof Continue || res instanceof Break){
+                    //    return null;
+                    //}
+                });
+                this.entro = true;
+            }
+        }
+        return null;
+    }
+}
+
 
 /***/ }),
 
@@ -1140,6 +1397,263 @@ class Primitivo extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
 
 /***/ }),
 
+/***/ "LqoN":
+/*!**********************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Expresion/Relacional.ts ***!
+  \**********************************************************/
+/*! exports provided: Relacional */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Relacional", function() { return Relacional; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AST/Tipo */ "EsxH");
+
+
+
+/**
+ * @class Genera un nuevo nodo expresion para realizar operaciones relacionales
+ */
+class Relacional extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Devuelve el nodo expresion para ser utilizado con otras operaciones
+     * @param izquierdo Nodo expresion izquierdo
+     * @param derecho Nodo expresion derecho
+     * @param operador Operador
+     * @param fila filaa de la operacion
+     * @param columna columnaa de la operacion
+     */
+    constructor(izquierdo, derecho, operador, fila, columna) {
+        super(new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN), fila, columna);
+        this.izquierdo = izquierdo;
+        this.derecho = derecho;
+        this.operador = operador;
+    }
+    ejecutar(tabla, ast) {
+        const LeftResult = this.izquierdo.ejecutar(tabla, ast);
+        if (LeftResult instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+            return LeftResult;
+        }
+        /*if(this.derecho == null){
+            if(this.operador == '!'){
+                if (this.izquierdo.tipo.tipo == Tipos.BOOLEAN) {
+                    return !LeftResult;
+                }else {
+                    const error = new Error("Semantico", "Error de tipo en NEGACION se esta tratando de operar " + this.izquierdo.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+            }
+        }else{*/
+        const RightResult = this.derecho.ejecutar(tabla, ast);
+        if (RightResult instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+            return RightResult;
+        }
+        if (this.operador == '<') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult < RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en MENOR QUE se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else if (this.operador == '>') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult > RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en MAYOR QUE se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else if (this.operador == '>=') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult >= RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en MAYOR IGUAL se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else if (this.operador == '<=') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult <= RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en MENOR IGUAL se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else if (this.operador == '!=') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult != RightResult;
+            }
+            else if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING) {
+                return LeftResult != RightResult;
+            }
+            else if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN) {
+                return LeftResult != RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en DIFERENTE QUE se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else if (this.operador == '==') {
+            if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                return LeftResult == RightResult;
+            }
+            else if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING) {
+                return LeftResult == RightResult;
+            }
+            else if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN) {
+                return LeftResult == RightResult;
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en IGUAL IGUAL se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                return error;
+            }
+        }
+        else {
+            const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error operador desconocido", this.fila, this.columna);
+            ast.errores.push(error);
+            //ast.consola.push(error.toString());
+            return error;
+        }
+        /*}*/
+    }
+}
+
+
+/***/ }),
+
+/***/ "NP5J":
+/*!*************************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Instruccion/Declaracion.ts ***!
+  \*************************************************************/
+/*! exports provided: Declaracion */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Declaracion", function() { return Declaracion; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _AST_Simbolo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AST/Simbolo */ "w77F");
+
+
+
+/**
+ * @class Inserta una nueva variable en la tabla de simbolos
+ */
+class Declaracion extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Crea el nodo instruccion para la sentencia Declaracion
+     * @param type Tipo de la variable
+     * @param identifier nombre de la variable
+     * @param valor valor de la variable
+     * @param line Linea de la sentencia if
+     * @param column Columna de la sentencia if
+     */
+    constructor(constante, declaraciones, fila, columna) {
+        super(null, fila, columna);
+        this.constante = constante;
+        this.declaraciones = declaraciones;
+    }
+    ejecutar(tabla, ast) {
+        this.declaraciones.map((m) => {
+            if (this.constante == true) {
+                if (m.valor == null) {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Constante " + m.identificador + " no inicializada ", m.fila, m.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+                else {
+                    const result = m.valor.ejecutar(tabla, ast);
+                    if (result instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                        return result;
+                    }
+                    if (m.tipo == null) {
+                        m.tipo = m.valor.tipo;
+                    }
+                    else if (m.tipo.tipo != m.valor.tipo.tipo) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se puede declarar la variable " + m.identificador + " los tipos no coinciden", m.fila, m.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                        return error;
+                    }
+                    let simbolo;
+                    simbolo = new _AST_Simbolo__WEBPACK_IMPORTED_MODULE_2__["Simbolo"](m.tipo, m.identificador, result, this.constante);
+                    const res = tabla.setVariable(simbolo);
+                    if (res != null) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", res, m.fila, m.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                    }
+                    return null;
+                }
+            }
+            else {
+                if (m.valor == null) {
+                    let simbolo;
+                    simbolo = new _AST_Simbolo__WEBPACK_IMPORTED_MODULE_2__["Simbolo"](m.tipo, m.identificador, null, this.constante);
+                    const res = tabla.setVariable(simbolo);
+                    if (res != null) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", res, m.fila, m.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                    }
+                    return null;
+                }
+                else {
+                    const result = m.valor.ejecutar(tabla, ast);
+                    if (result instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                        return result;
+                    }
+                    if (m.tipo == null) {
+                        m.tipo = m.valor.tipo;
+                    }
+                    else if (m.tipo.tipo != m.valor.tipo.tipo) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se puede declarar la variable " + m.identificador + " porque los tipos no coinciden.", m.fila, m.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                        return error;
+                    }
+                    let simbolo;
+                    simbolo = new _AST_Simbolo__WEBPACK_IMPORTED_MODULE_2__["Simbolo"](m.tipo, m.identificador, result, this.constante);
+                    const res = tabla.setVariable(simbolo);
+                    if (res != null) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", res, m.fila, m.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                    }
+                    return null;
+                }
+            }
+        });
+    }
+}
+
+
+/***/ }),
+
 /***/ "RfN4":
 /*!***********************************************!*\
   !*** ./src/app/pagina/Ejecucion/AST/Error.ts ***!
@@ -1168,7 +1682,7 @@ class Error {
         this.columna = columna;
     }
     toString() {
-        return `${this.tipo} ${this.descripcion} ${this.fila} ${this.columna}`;
+        return "Tipo:" + this.tipo + " Descripcion:" + this.descripcion + " Fila:" + this.fila + " Columna:" + this.columna;
     }
 }
 
@@ -1259,68 +1773,102 @@ class Aritmetica extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             if (operacionDer instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
                 return operacionDer;
             }
-            if (this.operacion === '+') {
-                if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+            if (this.operacion == '+') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
                     return operacionIzq + operacionDer;
                 }
-                else if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING || this.derecho.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING) {
+                else if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING || this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].STRING);
                     return operacionIzq + operacionDer;
                 }
                 else {
-                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error de Tipos en la suma se esta tratando de operar ${this.izquierdo.tipo.tipo} y ${this.derecho.tipo.tipo}`, this.fila, this.columna);
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de sumar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
-                    ast.consola.push(error.toString());
+                    //ast.consola.push(error.toString());
                     return error;
                 }
             }
-            else if (this.operacion === '-') {
-                if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+            else if (this.operacion == '-') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
                     return operacionIzq - operacionDer;
                 }
                 else {
-                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error de Tipos en la resta se esta tratando de operar ${this.izquierdo.tipo.tipo} y ${this.derecho.tipo.tipo}`, this.fila, this.columna);
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de restar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
-                    ast.consola.push(error.toString());
+                    //ast.consola.push(error.toString());
                     return error;
                 }
             }
-            else if (this.operacion === '*') {
-                if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+            else if (this.operacion == '*') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
                     return operacionIzq * operacionDer;
                 }
                 else {
-                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error de Tipos en la multiplicacion se esta tratando de operar ${this.izquierdo.tipo.tipo} y ${this.derecho.tipo.tipo}`, this.fila, this.columna);
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de multiplicar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
-                    ast.consola.push(error.toString());
+                    //ast.consola.push(error.toString());
                     return error;
                 }
             }
-            else if (this.operacion === '/') {
-                if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+            else if (this.operacion == '/') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
-                    if (operacionDer === 0) {
-                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error aritmetico, La division con cero no esta permitida`, this.fila, this.columna);
+                    if (operacionDer == 0) {
+                        const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error aritmetico -> se esta tratando de dividir entre cero ", this.fila, this.columna);
                         ast.errores.push(error);
-                        ast.consola.push(error.toString());
+                        //ast.consola.push(error.toString());
                         return error;
                     }
                     return operacionIzq / operacionDer;
                 }
                 else {
-                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error de Tipos en la division se esta tratando de operar ${this.izquierdo.tipo.tipo} y ${this.derecho.tipo.tipo}`, this.fila, this.columna);
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de dividir " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
-                    ast.consola.push(error.toString());
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+            }
+            else if (this.operacion == '^') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                    this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
+                    if (operacionDer == 0) {
+                        return 1;
+                    }
+                    else {
+                        let numero = operacionIzq;
+                        for (let index = 0; index < operacionDer - 1; index++) {
+                            numero = numero * operacionIzq;
+                        }
+                        return numero;
+                    }
+                    //return operacionIzq ^ operacionDer;
+                }
+                else {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de elevar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+            }
+            else if (this.operacion == '%') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+                    this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
+                    return operacionIzq % operacionDer;
+                }
+                else {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> se esta tratando de obtener el modulo " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
                     return error;
                 }
             }
             else {
-                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error, Operador desconocido`, this.fila, this.columna);
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error, Operador desconocido", this.fila, this.columna);
                 ast.errores.push(error);
-                ast.consola.push(error.toString());
+                //ast.consola.push(error.toString());
                 return error;
             }
         }
@@ -1329,25 +1877,125 @@ class Aritmetica extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             if (operacionIzq instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
                 return operacionIzq;
             }
-            if (this.operacion === '-') {
-                if (this.izquierdo.tipo.tipo === _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
+            if (this.operacion == '-') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER) {
                     this.tipo = new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].NUMBER);
                     return -1 * operacionIzq;
                 }
                 else {
-                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error de Tipos en el operador unario se esta tratando de operar ${this.izquierdo.tipo.tipo}`, this.fila, this.columna);
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de Tipos -> el operador unario tratando de operar " + this.izquierdo.tipo.toString(), this.fila, this.columna);
                     ast.errores.push(error);
-                    ast.consola.push(error.toString());
+                    //ast.consola.push(error.toString());
                     return error;
                 }
             }
             else {
-                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]('Semantico', `Error, Operador desconocido`, this.fila, this.columna);
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error -> Operador desconocido", this.fila, this.columna);
                 ast.errores.push(error);
-                ast.consola.push(error.toString());
+                //ast.consola.push(error.toString());
                 return error;
             }
         }
+    }
+}
+
+
+/***/ }),
+
+/***/ "WLoS":
+/*!************************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Instruccion/Asignacion.ts ***!
+  \************************************************************/
+/*! exports provided: Asignacion */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Asignacion", function() { return Asignacion; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _Expresion_Identificador__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Expresion/Identificador */ "Afb6");
+
+
+
+/**
+ * @class Reasigna el valor de una variable existente
+ */
+class Asignacion extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Crea el nodo instruccion para la sentencia Asignacion
+     * @param identificador nombre de la variable
+     * @param valor valor de la variable
+     * @param fila filaa de la sentencia if
+     * @param columna columnaa de la sentencia if
+     */
+    constructor(asignaciones, fila, columna) {
+        super(null, fila, columna);
+        this.asignaciones = asignaciones;
+    }
+    ejecutar(tabla, ast) {
+        this.asignaciones.map((m) => {
+            if (m instanceof _Expresion_Identificador__WEBPACK_IMPORTED_MODULE_2__["Identificador"]) {
+                const result = m.valor.ejecutar(tabla, ast);
+                if (result instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                    return result;
+                }
+                let variable;
+                variable = tabla.getVariable(m.identificador);
+                if (variable == null) {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se ha encontrado la variable " + m.identificador, m.fila, m.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+                else if (variable.constante == true) {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se puede asignar un nuevo valor a la constante " + m.identificador, m.fila, m.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+                if (variable.tipo == null) {
+                    variable.tipo = m.valor.tipo;
+                }
+                else if (m.valor.tipo.tipo != variable.tipo.tipo) {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "No se puede asignar la variable porque los tipos no coinciden", m.fila, m.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+                variable.valor = result;
+                return null;
+            }
+        });
+        /*
+                const result = this.valor.ejecutar(tabla, ast);
+                if (result instanceof Error) {
+                    return result;
+                }
+        
+                let variable:Simbolo;
+                variable = tabla.getVariable(this.identificador);
+                if (variable == null) {
+                    const error = new Error('Semantico',
+                        'No se ha encontrado la variable ' + this.identificador,
+                        this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+        
+        
+                if (this.valor.tipo.tipo != variable.tipo.tipo) {
+                    const error = new Error('Semantico',
+                        `No se puede asignar la variable porque los tipos no coinciden.`,
+                        this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
+        
+                variable.valor = result;
+                return error;*/
     }
 }
 
@@ -1416,35 +2064,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PaginaComponent", function() { return PaginaComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "fXoL");
 /* harmony import */ var _Ejecucion_AST_Tabla__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Ejecucion/AST/Tabla */ "fK0c");
-/* harmony import */ var _Ejecucion_Instruccion_ConsoleLog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Ejecucion/Instruccion/ConsoleLog */ "BLdb");
+/* harmony import */ var _Ejecucion_Instruccion_Declaracion__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Ejecucion/Instruccion/Declaracion */ "NP5J");
 
 
-//Carpeta Instruccion
 
 
 //Analizador
 var parser = __webpack_require__(/*! ./Ejecucion/gramatica.js */ "I4SB");
 class PaginaComponent {
-    constructor() { }
+    constructor() {
+    }
+    texto() {
+        let a = 'const a =10;\nlet b = false;\nif( !b && a != 10 ){\nconsole.log("ah... :v");\n}else if( true || !true){\nconsole.log("que");\n}else{\nconsole.log("rico");\n}';
+        document.getElementById('txtEntrada').innerHTML = a;
+    }
     ngOnInit() {
     }
     //aqui va todo el codigo xd
     exec() {
+        this.texto();
         var entrada = document.getElementById("txtEntrada").value;
         let ast = parser.parse(entrada);
         let tabla = new _Ejecucion_AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](null);
         ast.instrucciones.map((m) => {
-            if (m instanceof _Ejecucion_Instruccion_ConsoleLog__WEBPACK_IMPORTED_MODULE_2__["ConsoleLog"]) {
+            if (m instanceof _Ejecucion_Instruccion_Declaracion__WEBPACK_IMPORTED_MODULE_2__["Declaracion"]) {
                 m.ejecutar(tabla, ast);
             }
         });
+        console.log(tabla);
+        ast.instrucciones.map((m) => {
+            if (!(m instanceof _Ejecucion_Instruccion_Declaracion__WEBPACK_IMPORTED_MODULE_2__["Declaracion"])) {
+                m.ejecutar(tabla, ast);
+            }
+        });
+        console.log(ast);
         let a = "";
-        //console.log(2+2);
         ast.consola.map((m) => {
             a += m + "\n";
         });
-        var json = JSON.stringify(ast, null, 3);
-        console.log(json);
+        ast.errores.map((m) => {
+            console.log(m.toString());
+        });
+        //var json = JSON.stringify(ast,null,3);
+        //console.log(json);
         document.getElementById('txtSalida').innerHTML = a;
         //json = json.split('lexema').join('text').split('lista').join('children').split('lista').join('children');
         /*
@@ -1459,51 +2121,47 @@ class PaginaComponent {
     }
 }
 PaginaComponent.ɵfac = function PaginaComponent_Factory(t) { return new (t || PaginaComponent)(); };
-PaginaComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: PaginaComponent, selectors: [["app-pagina"]], decls: 27, vars: 0, consts: [[1, "navbar", "navbar-light", "bg-secondary"], [1, "container"], ["href", "#", 1, "navbar-brand"], ["role", "group", 1, "card-group", "p-5"], [1, "card", "bg-success"], ["_ngcontent-srk-c16", "", 1, "list-group-item", "list-group-item-primary", "text-center", "text-success", "bg-light"], ["_ngcontent-srk-c16", "", 1, "card-body", "p-3", "mb-2", "bg-transparent"], ["_ngcontent-srk-c16", "", "id", "txtEntrada", "rows", "15", 1, "form-control", "ng-pristine", "ng-valid", "ng-touched", "bg-dark", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnEjecutar", 1, "btn", "p-2", "mb-1", "btn-outline-success", "btn-lg", "bg-warning", "text-light", 3, "click"], ["_ngcontent-srk-c16", "", "type", "button", "id", "tbnTraducir", 1, "btn", "p-2", "mb-1", "btn-outline-success", "btn-lg", "bg-info", "text-light"], ["_ngcontent-srk-c16", "", 1, "card", "bg-danger"], ["_ngcontent-srk-c16", "", 1, "list-group-item", "list-group-item-primary", "text-center", "text-danger", "bg-light"], ["_ngcontent-srk-c16", "", 1, "card-body", "bg-secondary", "btn-lg", "bg-danger"], ["_ngcontent-srk-c16", "", "readonly", "", "id", "txtSalida", "rows", "15", 1, "form-control", "ng-pristine", "ng-valid", "ng-touched", "bg-dark", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnAST", 1, "btn", "p-2", "mb-1", "btn-outline-danger", "btn-lg", "bg-primary", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnErrores", 1, "btn", "p-2", "mb-1", "btn-outline-danger", "btn-lg", "bg-secondary", "text-light"], ["id", "salidaAST", 1, "card", "bg-transparent"]], template: function PaginaComponent_Template(rf, ctx) { if (rf & 1) {
+PaginaComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: PaginaComponent, selectors: [["app-pagina"]], decls: 25, vars: 0, consts: [[1, "navbar", "navbar-light", "bg-secondary"], [1, "container"], ["role", "group", 1, "card-group", "p-5"], [1, "card", "bg-success"], ["_ngcontent-srk-c16", "", 1, "list-group-item", "list-group-item-primary", "text-center", "text-success", "bg-light"], ["_ngcontent-srk-c16", "", 1, "card-body", "p-3", "mb-2", "bg-transparent"], ["_ngcontent-srk-c16", "", "id", "txtEntrada", "rows", "15", 1, "form-control", "ng-pristine", "ng-valid", "ng-touched", "bg-dark", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnEjecutar", 1, "btn", "p-2", "mb-1", "btn-outline-success", "btn-lg", "bg-warning", "text-light", 3, "click"], ["_ngcontent-srk-c16", "", "type", "button", "id", "tbnTraducir", 1, "btn", "p-2", "mb-1", "btn-outline-success", "btn-lg", "bg-info", "text-light"], ["_ngcontent-srk-c16", "", 1, "card", "bg-danger"], ["_ngcontent-srk-c16", "", 1, "list-group-item", "list-group-item-primary", "text-center", "text-danger", "bg-light"], ["_ngcontent-srk-c16", "", 1, "card-body", "bg-secondary", "btn-lg", "bg-danger"], ["_ngcontent-srk-c16", "", "readonly", "", "id", "txtSalida", "rows", "15", 1, "form-control", "ng-pristine", "ng-valid", "ng-touched", "bg-dark", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnAST", 1, "btn", "p-2", "mb-1", "btn-outline-danger", "btn-lg", "bg-primary", "text-light"], ["_ngcontent-srk-c16", "", "type", "button", "id", "btnErrores", 1, "btn", "p-2", "mb-1", "btn-outline-danger", "btn-lg", "bg-secondary", "text-light"], ["id", "salidaAST", 1, "card", "bg-transparent"]], template: function PaginaComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "nav", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](1, "div", 1);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "a", 2);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](3, "h4");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](4, "MatrioshTS");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](2, "h1");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](3, "MatrioshTS");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](4, "div", 2);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](5, "div", 3);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "div", 4);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](7, "h4", 5);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](8, "Entrada");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](6, "h4", 4);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](7, "Entrada");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](9, "div", 6);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "textarea", 7);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](11, "console.log(2+2);\n                console.log(2+2);\n            ");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](8, "div", 5);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](9, "textarea", 6);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "button", 7);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function PaginaComponent_Template_button_click_10_listener() { return ctx.exec(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](11, "Ejecutar");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](12, "button", 8);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function PaginaComponent_Template_button_click_12_listener() { return ctx.exec(); });
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](13, "Ejecutar");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](14, "button", 9);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](15, "Traducir");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](13, "Traducir");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](16, "div", 10);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](17, "h4", 11);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](18, "Salida");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](14, "div", 9);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](15, "h4", 10);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](16, "Salida");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](19, "div", 12);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](20, "textarea", 13);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](17, "div", 11);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](18, "textarea", 12);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](19, "button", 13);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](20, "AST");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](21, "button", 14);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](22, "AST");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](23, "button", 15);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](24, "Errores");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](22, "Errores");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](25, "div", 3);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](26, "div", 16);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](23, "div", 2);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](24, "div", 15);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
     } }, styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL3BhZ2luYS9wYWdpbmEuY29tcG9uZW50LmNzcyJ9 */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](PaginaComponent, [{
@@ -1546,14 +2204,14 @@ class Tabla {
      * @param simbol Simbolo que contiene la informacion de la variable a almacenar
      */
     setVariable(simbolo) {
-        let env;
-        for (env = this; env != null; env = env.anterior) {
-            for (let key of Array.from(env.variables.keys())) {
-                if (key === simbolo.id) {
-                    return `La variable ${key} ya ha sido declarada.`;
-                }
+        let env = this;
+        //for(env = this; env != null; env = env.anterior){
+        for (let key of Array.from(env.variables.keys())) {
+            if (key == simbolo.id) {
+                return "La variable " + key + " ya ha sido declarada";
             }
         }
+        //}
         this.variables.set(simbolo.id, simbolo);
         return null;
     }
@@ -1566,12 +2224,114 @@ class Tabla {
         let env;
         for (env = this; env != null; env = env.anterior) {
             for (let key of Array.from(env.variables.keys())) {
-                if (key === id) {
+                if (key == id) {
                     return env.variables.get(key);
                 }
             }
         }
         return null;
+    }
+}
+
+
+/***/ }),
+
+/***/ "lcmB":
+/*!******************************************************!*\
+  !*** ./src/app/pagina/Ejecucion/Expresion/Logica.ts ***!
+  \******************************************************/
+/*! exports provided: Logica */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Logica", function() { return Logica; });
+/* harmony import */ var _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../AST/NodoAST */ "+1g/");
+/* harmony import */ var _AST_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../AST/Error */ "RfN4");
+/* harmony import */ var _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../AST/Tipo */ "EsxH");
+
+
+
+/**
+ * @class Genera un nuevo nodo expresion para realizar operaciones logicas
+ */
+class Logica extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
+    /**
+     * @constructor Devuelve el nodo expresion para ser utilizado con otras operaciones
+     * @param izquierdo Nodo expresion izquierdo
+     * @param derecho Nodo expresion derecho
+     * @param operador Operador
+     * @param fila filaa de la operacion
+     * @param columna columnaa de la operacion
+     */
+    constructor(izquierdo, derecho, operador, fila, columna) {
+        super(new _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipo"](_AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN), fila, columna);
+        this.izquierdo = izquierdo;
+        this.derecho = derecho;
+        this.operador = operador;
+    }
+    ejecutar(tabla, ast) {
+        if (this.derecho != null) {
+            const LeftResult = this.izquierdo.ejecutar(tabla, ast);
+            if (LeftResult instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                return LeftResult;
+            }
+            const RightResult = this.derecho.ejecutar(tabla, ast);
+            if (RightResult instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                return RightResult;
+            }
+            if (this.operador == '||') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN) {
+                    return LeftResult || RightResult;
+                }
+                else {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en OR se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.tostring());
+                    return error;
+                }
+            }
+            else if (this.operador == '&&') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN && this.derecho.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN) {
+                    return LeftResult && RightResult;
+                }
+                else {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en AND se esta tratando de operar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.tostring());
+                    return error;
+                }
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error, Operador desconocido", this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.tostring());
+                return error;
+            }
+        }
+        else {
+            const LeftResult = this.izquierdo.ejecutar(tabla, ast);
+            if (LeftResult instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]) {
+                return LeftResult;
+            }
+            if (this.operador == '!') {
+                if (this.izquierdo.tipo.tipo == _AST_Tipo__WEBPACK_IMPORTED_MODULE_2__["Tipos"].BOOLEAN) {
+                    return !LeftResult;
+                }
+                else {
+                    const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error de tipos en el operador NOT se esta tratando de operar" + this.izquierdo.tipo.toString(), this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.tostring());
+                    return error;
+                }
+            }
+            else {
+                const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_1__["Error"]("Semantico", "Error, Operador desconocido", this.fila, this.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.tostring());
+                return error;
+            }
+        }
     }
 }
 
@@ -1659,10 +2419,11 @@ class Simbolo {
      * @param identifier Nombre de la variable o funcion
      * @param value Valor de la variable u objeto completo de la función
      */
-    constructor(tipo, id, valor) {
+    constructor(tipo, id, valor, constante) {
         this.tipo = tipo;
         this.id = id;
         this.valor = valor;
+        this.constante = constante;
     }
 }
 
