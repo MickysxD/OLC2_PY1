@@ -21,13 +21,26 @@
             <textarea _ngcontent-srk-c16="" readonly="" id="txtSalida" rows="15" class="form-control ng-pristine ng-valid ng-touched bg-dark text-light"></textarea>
         </div>
             <button _ngcontent-srk-c16="" type="button" id="btnAST" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-primary text-light">AST</button>
-            <button _ngcontent-srk-c16="" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
+            <button _ngcontent-srk-c16="" (click)="errores()" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
 
     </div>
 </div>
 
 <div class="card-group p-5"  role="group">
-    <div  class="card bg-transparent"  id="salidaAST">
-        
+    <div  class="card invisible table-responsive"  id="salida">
+        <table class="table table-striped invisible" id="tablaErrores">
+            <thead>
+                <tr>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Fila</th>
+                    <th scope="col">Columna</th>
+                </tr>
+            </thead>
+            
+            <tbody id="infoTabla">
+                
+            </tbody>
+        </table>
     </div>
 </div>

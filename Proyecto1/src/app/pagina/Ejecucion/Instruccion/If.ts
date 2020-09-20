@@ -3,9 +3,8 @@ import { Tabla } from "../AST/Tabla";
 import { AST } from "../AST/AST";
 import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
-/*
-import { Continue } from "../Expresiones/Continue";
-import { Break } from "../Expresiones/Break";*/
+import { Continue } from "../Expresion/Continue";
+import { Break } from "../Expresion/Break";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -54,11 +53,11 @@ export class If extends NodoAST {
 
         if (result) {
             if(this.sentenciasIF != null){
-                this.sentenciasIF.map((m:If) =>{
+                this.sentenciasIF.map((m) =>{
                     m.ejecutar(nuevoEntorno, ast);
                     //if(res instanceof Continue || res instanceof Break){
                     //    return null;
-                    //}
+                    //}//
                 });
                 this.entro = true;
             }
@@ -81,7 +80,7 @@ export class If extends NodoAST {
             }
             
             if(this.sentenciasELSE != null && !this.entro){
-                this.sentenciasELSE.map((m:If) =>{
+                this.sentenciasELSE.map((m) =>{
                     const res = m.ejecutar(nuevoEntorno, ast);
                     //if(res instanceof Continue || res instanceof Break){
                     //    return null;

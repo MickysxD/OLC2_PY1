@@ -15,6 +15,8 @@
     var {Identificador} = require("./Expresion/Identificador");
     var {Relacional} = require("./Expresion/Relacional");
     var {Logica} = require("./Expresion/Logica");
+    var { Continue } = require("./Expresion/Continue");
+    var { Break } = require("./Expresion/Break");
     
     
     //Carpeta Instruccion
@@ -22,6 +24,8 @@
     var {Declaracion} = require("./Instruccion/Declaracion");
     var {Asignacion} = require("./Instruccion/Asignacion");
     var {If} = require("./Instruccion/If");
+    var {While} = require("./Instruccion/While");
+    var {DoWhile} = require("./Instruccion/DoWhile");
 
 
     var errores = [];
@@ -185,6 +189,10 @@ INSTRUCCION: CONSOLE                      {$$ = $1;}
            | DECLARACION                  {$$ = $1;}
            | ASIGNACION                   {$$ = $1;}
            | IF                           {$$ = $1;}
+           | WHILE                        {$$ = $1;}
+           | DOWHILE                      {$$ = $1;}
+           | BREAK                        {$$ = $1;}
+           | CONTINUE                     {$$ = $1;}
            /*| ERROR                        {$$ = $1;}*/
 ;
 
@@ -193,6 +201,13 @@ INSTRUCCION: CONSOLE                      {$$ = $1;}
 CONSOLE: TK_CONSOLE '(' EXPRESION ')' ';'       {$$ = new ConsoleLog($3, @1.first_line, @1.first_column);}
 ;
 
+//Break
+BREAK: TK_BREAK ';'                             {$$ = new Break(@1.first_line, @1.first_column);}
+;
+
+//Continue
+CONTINUE: TK_CONTINUE ';'                       {$$ = new Continue(@1.first_line, @1.first_column);}
+;
 
 //Declaracion y su listado
 DECLARACION: TK_CONST LISTA_DECLARACION ';'      {$$ = new Declaracion(true, $2);}
@@ -243,6 +258,13 @@ LISTA_IF: LISTA_IF ELSE_IF             {$$ =$1; $$.push($2);}
 ELSE_IF: TK_ELSE TK_IF CONDICION BLOQUE_INSTRUCCIONES          {$$ = new If($3, $4, null, null, @1.first_line, @1.first_column);}
 ;
 
+
+//While y do while
+WHILE: TK_WHILE CONDICION BLOQUE_INSTRUCCIONES                  {$$ = new While($2, $3, @1.first_line, @1.first_column);}
+;
+
+DOWHILE: TK_DO BLOQUE_INSTRUCCIONES TK_WHILE CONDICION ';'      {$$ = new DoWhile($4, $2, @1.first_line, @1.first_column);}
+;
 
 //Tipos de datos de variables y funciones
 TIPO: TK_STRING                                  {$$ = new Tipo(Tipos.STRING);}
