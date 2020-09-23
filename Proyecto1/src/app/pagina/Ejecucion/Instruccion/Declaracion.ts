@@ -28,81 +28,103 @@ export class Declaracion extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST) {
-
+        let retorno = null;
         this.declaraciones.map((m:Identificador) =>{
-            if(this.constante == true){
-                if(m.valor == null){
-                    const error = new Error("Semantico", "Constante " + m.identificador + " no inicializada ", m.fila, m.columna);
-                    ast.errores.push(error);
-                    //ast.consola.push(error.toString());
-                    return error;
-
-                }else{
-                    const result = m.valor.ejecutar(tabla, ast);
-                    if (result instanceof Error) {
-                        return result;
-                    }
-
-                    if(m.tipo == null){
-                        m.tipo = m.valor.tipo;
-                    }else if (m.tipo.tipo != m.valor.tipo.tipo) {
-                        const error = new Error("Semantico", "No se puede declarar la variable " + m.identificador + " los tipos no coinciden", m.fila, m.columna);
+            if(m.tipo != null && m.tipo.tipo == Tipos.VOID){
+                if(this.constante == true){
+                    if(m.valor == null){
+                        const error = new Error("Semantico", "Constante " + m.identificador + " no inicializada ", m.fila, m.columna);
                         ast.errores.push(error);
                         //ast.consola.push(error.toString());
+                        retorno = error;
                         return error;
+    
+                    }else{
+                        const result = m.valor.ejecutar(tabla, ast);
+                        if (result instanceof Error) {
+                            retorno = result;
+                            return result;
+                        }
+    
+                        if(m.tipo == null){
+                            m.tipo = m.valor.tipo;
+                        }else if (m.tipo.tipo != m.valor.tipo.tipo) {
+                            const error = new Error("Semantico", "No se puede declarar la variable " + m.identificador + " los tipos no coinciden", m.fila, m.columna);
+                            ast.errores.push(error);
+                            //ast.consola.push(error.toString());
+                            retorno = error;
+                            return error;
+                        }
+    
+                        let simbolo:Simbolo;
+                        simbolo = new Simbolo(m.tipo, m.identificador, result, this.constante);
+                        const res = tabla.setVariable(simbolo);
+                        if (res != null) {
+                            const error = new Error("Semantico", res, m.fila, m.columna);
+                            ast.errores.push(error);
+                            //ast.consola.push(error.toString());
+                            retorno = error;
+                            return error;
+                        }
+                        return retorno;
                     }
-
-                    let simbolo:Simbolo;
-                    simbolo = new Simbolo(m.tipo, m.identificador, result, this.constante);
-                    const res = tabla.setVariable(simbolo);
-                    if (res != null) {
-                        const error = new Error("Semantico", res, m.fila, m.columna);
-                        ast.errores.push(error);
-                        //ast.consola.push(error.toString());
+    
+                }else{
+                    if(m.valor == null){
+                        let simbolo:Simbolo;
+                        simbolo = new Simbolo(m.tipo, m.identificador, null, this.constante);
+                        const res = tabla.setVariable(simbolo);
+                        if (res != null) {
+                            const error = new Error("Semantico", res, m.fila, m.columna);
+                            ast.errores.push(error);
+                            //ast.consola.push(error.toString());
+                            retorno = error;
+                            return error;
+                        }
+                        return retorno;
+    
+                    }else{
+                        const result = m.valor.ejecutar(tabla, ast);
+                        if (result instanceof Error) {
+                            retorno = result;
+                            return result;
+                        }
+    
+                        if(m.tipo == null){
+                            m.tipo = m.valor.tipo;
+                        }else if (m.tipo.tipo != m.valor.tipo.tipo) {
+                            const error = new Error("Semantico", "No se puede declarar la variable " + m.identificador + " porque los tipos no coinciden.", m.fila, m.columna);
+                            ast.errores.push(error);
+                            //ast.consola.push(error.toString());
+                            retorno = error;
+                            return error;
+                        }
+    
+                        let simbolo:Simbolo;
+                        simbolo = new Simbolo(m.tipo, m.identificador, result, this.constante);
+                        const res = tabla.setVariable(simbolo);
+                        if (res != null) {
+                            const error = new Error("Semantico", res, m.fila, m.columna);
+                            ast.errores.push(error);
+                            //ast.consola.push(error.toString());
+                            retorno = error;
+                            return error;
+                        }
+                        return retorno;
                     }
-                    return null;
+    
                 }
-
             }else{
-                if(m.valor == null){
-                    let simbolo:Simbolo;
-                    simbolo = new Simbolo(m.tipo, m.identificador, null, this.constante);
-                    const res = tabla.setVariable(simbolo);
-                    if (res != null) {
-                        const error = new Error("Semantico", res, m.fila, m.columna);
-                        ast.errores.push(error);
-                        //ast.consola.push(error.toString());
-                    }
-                    return null;
-
-                }else{
-                    const result = m.valor.ejecutar(tabla, ast);
-                    if (result instanceof Error) {
-                        return result;
-                    }
-
-                    if(m.tipo == null){
-                        m.tipo = m.valor.tipo;
-                    }else if (m.tipo.tipo != m.valor.tipo.tipo) {
-                        const error = new Error("Semantico", "No se puede declarar la variable " + m.identificador + " porque los tipos no coinciden.", m.fila, m.columna);
-                        ast.errores.push(error);
-                        //ast.consola.push(error.toString());
-                        return error;
-                    }
-
-                    let simbolo:Simbolo;
-                    simbolo = new Simbolo(m.tipo, m.identificador, result, this.constante);
-                    const res = tabla.setVariable(simbolo);
-                    if (res != null) {
-                        const error = new Error("Semantico", res, m.fila, m.columna);
-                        ast.errores.push(error);
-                        //ast.consola.push(error.toString());
-                    }
-                    return null;
-                }
-
+                const error = new Error("Semantico", "Tipo void no asignable a variables", m.fila, m.columna);
+                ast.errores.push(error);
+                //ast.consola.push(error.toString());
+                retorno = error;
+                return error;
+            
             }
+            
         });
 
+        return retorno;
     }
 }

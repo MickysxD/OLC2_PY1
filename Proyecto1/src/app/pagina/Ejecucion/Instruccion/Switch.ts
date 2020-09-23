@@ -5,18 +5,15 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
+import { Case } from "./Case";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
  */
 
-export class If extends NodoAST {
+export class Switch extends NodoAST {
     condicion:NodoAST;
-    sentenciasIF:NodoAST[];
-    listaIFS:NodoAST[];
-    sentenciasELSE:NodoAST[];
-    entro:boolean;
-
+    cases:NodoAST[];
 
     /**
      * @constructor Crea el nodo instruccion para la sentencia IF
@@ -27,13 +24,10 @@ export class If extends NodoAST {
      * @param columna columnaa de la sentencia if
      */
 
-    constructor(condicion:NodoAST, sentenciasIF:NodoAST[], listaIFS:NodoAST[], sentenciasELSE:NodoAST[], fila:number, columna:number){
+    constructor(condicion:NodoAST, cases:NodoAST[], fila:number, columna:number){
         super(null, fila, columna);
         this.condicion = condicion;
-        this.sentenciasIF = sentenciasIF;
-        this.listaIFS = listaIFS;
-        this.sentenciasELSE = sentenciasELSE;
-        this.entro = null;
+        this.cases = cases;
     }
 
     ejecutar(tabla:Tabla, ast:AST){
@@ -46,7 +40,7 @@ export class If extends NodoAST {
             return result;
         }
 
-        if (this.condicion.tipo.tipo != Tipos.BOOLEAN) {
+        if (this.condicion.tipo.tipo != Tipos.NUMBER && this.condicion.tipo.tipo != Tipos.STRING) {
             const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
@@ -54,58 +48,54 @@ export class If extends NodoAST {
             return error;
         }
 
-        if (result) {
-            if(this.sentenciasIF != null){
-                this.sentenciasIF.map((m) =>{
-                    const res = m.ejecutar(nuevoEntorno, ast);
-                    if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                        retorno = res;
-                        return res;
-                    }
-                });
-                this.entro = true;
-                if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                    return retorno;
-                }
-            }
-            
-        } else {
-            if(this.listaIFS != null){
-                this.listaIFS.map((m:If) =>{
-                    const res = m.ejecutar(nuevoEntorno, ast);
-                    
-                    if(m.entro){
-                        this.entro = true;
-                        retorno = res;
-                        return res;
+        if(this.cases != null){
+            this.cases.map((m:Case) =>{
+                if(m.esDefault != true){
+                    let resultC:NodoAST;
+                    resultC = m.condicion.ejecutar(nuevoEntorno, ast);
+                    if (resultC instanceof Error) {
+                        retorno = resultC;
+                        return resultC;
                     }
 
-                    if (res instanceof Error) {
-                        retorno = res;
-                        return res;
+                    if (this.condicion.tipo.tipo != m.condicion.tipo.tipo) {
+                        const error = new Error("Semantico", "Los tipos no coinciden sentencia Switch", this.fila, this.columna);
+                        ast.errores.push(error);
+                        //ast.consola.push(error.toString());
+                        retorno = error;
+                        return error;
                     }
-                });
-                if(retorno instanceof Error){
-                    return retorno;
+
+                    if(resultC == result){
+                        const res = m.ejecutar(nuevoEntorno, ast);
+                        if(res instanceof Continue || res instanceof Break || res instanceof Error){
+                            retorno = res;
+                            return res;
+                        }
+                    }
                 }
+            });
+
+            if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
+                return retorno;
             }
-            
-            if(this.sentenciasELSE != null && !this.entro){
-                this.sentenciasELSE.map((m) =>{
+
+            this.cases.map((m:Case) =>{
+                if(m.esDefault == true){
                     const res = m.ejecutar(nuevoEntorno, ast);
                     if(res instanceof Continue || res instanceof Break || res instanceof Error){
                         retorno = res;
                         return res;
                     }
-                });
-                this.entro = true;
-                if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                    return retorno;
                 }
+            });
+
+            if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
+                return retorno;
             }
-            
         }
 
         return retorno;
+        
     }
 }

@@ -30,6 +30,7 @@ export class While extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
+        let retorno = null;
         let enciclado = 0;
 
         for (let index = 0; index <= 5000; index++){
@@ -37,6 +38,7 @@ export class While extends NodoAST {
             let result:NodoAST;
             result = this.condicion.ejecutar(nuevoEntorno, ast);
             if (result instanceof Error) {
+                retorno = result;
                 return result;
             }
 
@@ -44,6 +46,7 @@ export class While extends NodoAST {
                 const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
                 ast.errores.push(error);
                 //ast.consola.push(error.toString());
+                retorno = error;
                 return error;
             }
 
@@ -51,10 +54,15 @@ export class While extends NodoAST {
                 if(this.sentencias != null){
                     this.sentencias.map((m) =>{
                         const res = m.ejecutar(nuevoEntorno, ast);
-                        if(res instanceof Continue || res instanceof Break){
-                            return null;
+                        if(res instanceof Continue || res instanceof Break || res instanceof Error){
+                            index = 5000;
+                            retorno = res;
+                            return res;
                         }
                     });
+                    if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
+                        return retorno;
+                    }
                 }
             }else{
                 break;
@@ -67,9 +75,10 @@ export class While extends NodoAST {
             const error = new Error("Semantico", "Se ha enciclado la sentencia While", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
+            retorno = error;
             return error;
         }else{
-            return null;
+            return retorno;
         }
     }
 }

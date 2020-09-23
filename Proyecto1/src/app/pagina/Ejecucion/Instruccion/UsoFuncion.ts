@@ -5,13 +5,15 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Simbolo } from "../AST/Simbolo";
 import { Identificador } from '../Expresion/Identificador';
+import { Funcion } from './Funcion';
 
 /**
  * @class Reasigna el valor de una variable existente
  */
 
 export class Asignacion extends NodoAST {
-    asignaciones:NodoAST[];
+    identificador:string;
+    parametros:NodoAST[];
 
     /**
      * @constructor Crea el nodo instruccion para la sentencia Asignacion
@@ -21,13 +23,44 @@ export class Asignacion extends NodoAST {
      * @param columna columnaa de la sentencia if
      */
 
-    constructor(asignaciones:NodoAST[], fila:number, columna:number) {
+    constructor(identificador:string, parametros:NodoAST[], fila:number, columna:number) {
         super(null, fila, columna);
-        this.asignaciones = asignaciones;
+        this.identificador = identificador;
+        this.parametros = parametros;
     }
 
     ejecutar(tabla:Tabla, ast:AST) {
         let retorno = null;
+        const nuevoEntorno = new Tabla(tabla);
+        let nombre = "function_"+this.identificador;
+
+        if(this.parametros != null){
+            this.parametros.map((m) =>{
+                const result = m.ejecutar(tabla, ast);
+                if(result instanceof Error){
+                    retorno = result;
+                    return result;
+                }
+                nombre += '_' + m.tipo.tipo;
+            });
+            if(retorno instanceof Error){
+                return retorno;
+            }
+        }
+
+        let variable:Simbolo;
+        variable = tabla.getVariable(nombre);
+        if (variable == null) {
+            const error = new Error("Semantico","No se ha encontrado la funcion " + this.identificador, this.fila, this.columna);
+            ast.errores.push(error);
+            //ast.consola.push(error.toString());
+            retorno = error;
+            return error;
+        }
+
+        let funcion:Funcion = null;
+
+
         this.asignaciones.map((m:Identificador) =>{
             const result = m.valor.ejecutar(tabla, ast);
             if (result instanceof Error) {
@@ -65,7 +98,6 @@ export class Asignacion extends NodoAST {
             return retorno;
             
         });
-        
         return retorno;
     }
 }

@@ -127,7 +127,7 @@ export class Aritmetica extends NodoAST {
             }
 
         }else{
-            const operacionIzq = this.izquierdo.ejecutar(tabla, ast);
+            let operacionIzq = this.izquierdo.ejecutar(tabla, ast);
             if(operacionIzq instanceof Error){
                 return operacionIzq;
             }

@@ -24,6 +24,11 @@ import { Asignacion } from './Ejecucion/Instruccion/Asignacion';
 import { If } from './Ejecucion/Instruccion/If';
 import { While } from './Ejecucion/Instruccion/While';
 import { DoWhile } from './Ejecucion/Instruccion/DoWhile';
+import { For } from './Ejecucion/Instruccion/For';
+import { Switch } from './Ejecucion/Instruccion/Switch';
+import { Case } from './Ejecucion/Instruccion/Case';
+import { Ternario } from './Ejecucion/Instruccion/Ternario';
+import { Funcion } from './Ejecucion/Instruccion/Funcion';
 
 //Analizador
 var parser  = require("./Ejecucion/gramatica.js");
@@ -43,7 +48,7 @@ export class PaginaComponent implements OnInit {
   tabla:Tabla;
 
   texto(){
-    let a = 'const a =10;\nlet b = false;\nif( !b && a != 10 ){\nconsole.log("ah... :v");\n}else if( true || !true){\nconsole.log("que");\n}else{\nconsole.log("rico");\n}';
+    let a = '';
     document.getElementById('txtEntrada').innerHTML = a;
   }
 
@@ -92,7 +97,7 @@ export class PaginaComponent implements OnInit {
     let tabla:Tabla= new Tabla(null);
     
     ast.instrucciones.map((m) =>{
-      if(m instanceof Declaracion){
+      if(m instanceof Declaracion || m instanceof Funcion){
         m.ejecutar(tabla, ast);
       }
     });
@@ -100,7 +105,7 @@ export class PaginaComponent implements OnInit {
     console.log(tabla);
 
     ast.instrucciones.map((m) =>{
-      if(!(m instanceof Declaracion)){
+      if(!(m instanceof Declaracion) && !(m instanceof Funcion)){
         m.ejecutar(tabla, ast);
       }
     });

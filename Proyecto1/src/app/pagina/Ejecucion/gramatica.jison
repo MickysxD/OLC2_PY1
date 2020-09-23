@@ -15,8 +15,8 @@
     var {Identificador} = require("./Expresion/Identificador");
     var {Relacional} = require("./Expresion/Relacional");
     var {Logica} = require("./Expresion/Logica");
-    var { Continue } = require("./Expresion/Continue");
-    var { Break } = require("./Expresion/Break");
+    var {Continue} = require("./Expresion/Continue");
+    var {Break} = require("./Expresion/Break");
     
     
     //Carpeta Instruccion
@@ -26,6 +26,11 @@
     var {If} = require("./Instruccion/If");
     var {While} = require("./Instruccion/While");
     var {DoWhile} = require("./Instruccion/DoWhile");
+    var {For} = require("./Instruccion/For");
+    var {Switch} = require("./Instruccion/Switch");
+    var {Case} = require("./Instruccion/Case");
+    var {Ternario} = require("./Instruccion/Ternario");
+    var {Funcion} = require("./Instruccion/Funcion");
 
 
     var errores = [];
@@ -84,7 +89,7 @@
 ","                             return ',';
 "="                             return '=';
 "."                             return '.';
-
+"?"                             return '?';
 
 //Palabras reservadas
 "function"                      return 'TK_FUNCTION';
@@ -140,6 +145,7 @@
 
 
 /*Precedencias*/
+%left   '?' //':' ','
 %left   '||'
 %left   '&&'
 
@@ -185,33 +191,38 @@ INSTRUCCIONES: INSTRUCCIONES INSTRUCCION  { $$ = $1;
                                           }
 ;
 
-INSTRUCCION: CONSOLE                      {$$ = $1;}
-           | DECLARACION                  {$$ = $1;}
-           | ASIGNACION                   {$$ = $1;}
-           | IF                           {$$ = $1;}
-           | WHILE                        {$$ = $1;}
-           | DOWHILE                      {$$ = $1;}
-           | BREAK                        {$$ = $1;}
-           | CONTINUE                     {$$ = $1;}
+INSTRUCCION: CONSOLE                        {$$ = $1;}
+           | DECLARACION ';'                {$$ = $1;}
+           | ASIGNACION ';'                 {$$ = $1;}
+           | IF                             {$$ = $1;}
+           | WHILE                          {$$ = $1;}
+           | DOWHILE                        {$$ = $1;}
+           | FOR                            {$$ = $1;}
+           | SWITCH                         {$$ = $1;}
+           | BREAK                          {$$ = $1;}
+           | CONTINUE                       {$$ = $1;}
+           | TERNARIO ';'                   {$$ = $1;}
+           | FUNCION                        {$$ = $1;}
+           | USOFUNCION ';'                 {$$ = $1;}
            /*| ERROR                        {$$ = $1;}*/
 ;
 
 
 //Console.log
-CONSOLE: TK_CONSOLE '(' EXPRESION ')' ';'       {$$ = new ConsoleLog($3, @1.first_line, @1.first_column);}
+CONSOLE: TK_CONSOLE CONDICION ';'              {$$ = new ConsoleLog($2, @1.first_line, @1.first_column);}
 ;
 
 //Break
-BREAK: TK_BREAK ';'                             {$$ = new Break(@1.first_line, @1.first_column);}
+BREAK: TK_BREAK ';'                            {$$ = new Break(@1.first_line, @1.first_column);}
 ;
 
 //Continue
-CONTINUE: TK_CONTINUE ';'                       {$$ = new Continue(@1.first_line, @1.first_column);}
+CONTINUE: TK_CONTINUE ';'                      {$$ = new Continue(@1.first_line, @1.first_column);}
 ;
 
 //Declaracion y su listado
-DECLARACION: TK_CONST LISTA_DECLARACION ';'      {$$ = new Declaracion(true, $2);}
-           | TK_LET LISTA_DECLARACION ';'        {$$ = new Declaracion(false, $2);}
+DECLARACION: TK_CONST LISTA_DECLARACION     {$$ = new Declaracion(true, $2);}
+           | TK_LET LISTA_DECLARACION       {$$ = new Declaracion(false, $2);}
 ;
 
 LISTA_DECLARACION: LISTA_DECLARACION ',' ID_DECLARACION      {$$ = $1; $$.push($3);}
@@ -226,14 +237,16 @@ ID_DECLARACION: TK_ID ':' TIPO '=' EXPRESION			     {$$ = new Identificador($1, 
 
 
 //Asignacion y su listado
-ASIGNACION: LISTA_ASIGNACION ';'                             {$$ = new Asignacion($1);}
+ASIGNACION: LISTA_ASIGNACION                             {$$ = new Asignacion($1);}
 ;
 
 LISTA_ASIGNACION: LISTA_ASIGNACION ',' ID_ASIGNACION         {$$ = $1; $$.push($2);}
                 | ID_ASIGNACION                              {$$ = [$1];}
 ;
 
-ID_ASIGNACION: TK_ID '=' EXPRESION                           {$$ = new Identificador($1, null, $3, @1.first_line, @1.first_column);}
+ID_ASIGNACION: TK_ID '=' EXPRESION        {$$ = new Identificador($1, null, $3, @1.first_line, @1.first_column);}
+             | TK_ID '++'                 {$$ = new Identificador($1, null,  new Aritmetica(new Identificador($1, null, null, @1.first_line, @1.first_column), new Primitivo(new Tipo(Tipos.NUMBER), Number(1), @2.first_line, @2.first_column), '+', @1.first_line, @1.first_column), @1.first_line, @1.first_column);}
+             | TK_ID '--'       		  {$$ = new Identificador($1, null,  new Aritmetica(new Identificador($1, null, null, @1.first_line, @1.first_column), new Primitivo(new Tipo(Tipos.NUMBER), Number(1), @2.first_line, @2.first_column), '-', @1.first_line, @1.first_column), @1.first_line, @1.first_column);}
 ;
 
 
@@ -263,13 +276,60 @@ ELSE_IF: TK_ELSE TK_IF CONDICION BLOQUE_INSTRUCCIONES          {$$ = new If($3, 
 WHILE: TK_WHILE CONDICION BLOQUE_INSTRUCCIONES                  {$$ = new While($2, $3, @1.first_line, @1.first_column);}
 ;
 
-DOWHILE: TK_DO BLOQUE_INSTRUCCIONES TK_WHILE CONDICION ';'      {$$ = new DoWhile($4, $2, @1.first_line, @1.first_column);}
+DOWHILE: TK_DO BLOQUE_INSTRUCCIONES TK_WHILE CONDICION ';'     {$$ = new DoWhile($4, $2, @1.first_line, @1.first_column);}
+;
+
+
+//Swich case
+SWITCH: TK_SWITCH EXPRESION '{' LISTA_CASE '}'                  {$$ = new Switch($2, $4, $3, @1.first_line, @1.first_column);}
+;
+
+LISTA_CASE: LISTA_CASE CASE                                     {$$ = $1; $$.push($2)}
+          | CASE                                                {$$ = [$1];}
+;
+
+CASE: TK_CASE EXPRESION ':' INSTRUCCIONES                       {$$ = new Case(false, $2, $4, @1.first_line, @1.first_column);}
+    | TK_DEFAULT ':' INSTRUCCIONES                              {$$ = new Case(true, null, $3, @1.first_line, @1.first_column);}
+;
+
+
+//Ternario
+TERNARIO: EXPRESION '?' EXPRESION ':' EXPRESION        {$$ = new Ternario($1, $3, $5, @1.first_line, @1.first_column);}
+;
+
+
+//For
+FOR: TK_FOR '(' DECLARACION ';' EXPRESION ';' ASIGNACION ')' BLOQUE_INSTRUCCIONES     {$$ = new For($3, $5, $6, $8, @1.first_line, @1.first_column);}
+   | TK_FOR '(' ASIGNACION ';' EXPRESION ';' ASIGNACION ')' BLOQUE_INSTRUCCIONES      {$$ = new For($3, $5, $7, $9, @1.first_line, @1.first_column);}
+;
+
+
+//Funciones
+FUNCION: TK_FUNCTION TK_ID '(' LISTA_PARAMETROS ')' ':' TIPO '{' INSTRUCCIONES '}'        {$$ = new Funcion($2, $4, $7, $9, @1.first_line, @1.first_column);}
+       | TK_FUNCTION TK_ID '(' LISTA_PARAMETROS ')' '{' INSTRUCCIONES '}'                 {$$ = new Funcion($2, $4, new Tipo(Tipos.VOID), $7, @1.first_line, @1.first_column);}
+;
+
+LISTA_PARAMETROS: LISTA_PARAMETROS ',' PARAMETRO            {$$ = $1; $$.push($3);}
+                | PARAMETRO                                 {$$ = [$1];}
+;
+
+PARAMETRO: TK_ID ':' TIPO                                     {$$ = new Identificador($1, $3, null, @1.first_line, @1.first_column);}
+;
+
+//UsoFuncion
+USOFUNCION: TK_ID '(' LISTA_IDS ')'                      {$$ = new UsoFuncion($1, $2, @1.first_line, @1.first_column);}
+          | TK_ID '(' ')'                                {$$ = new UsoFuncion($1, null, @1.first_line, @1.first_column);}
+;
+
+LISTA_IDS: LISTA_IDS ',' EXPRESION                       {$$ = $1; $$.push($3);}
+         | EXPRESION                                     {$$ = [$1];}
 ;
 
 //Tipos de datos de variables y funciones
 TIPO: TK_STRING                                  {$$ = new Tipo(Tipos.STRING);}
     | TK_BOOLEAN                                 {$$ = new Tipo(Tipos.BOOLEAN);}
     | TK_NUMBER                                  {$$ = new Tipo(Tipos.NUMBER);}
+    | TK_VOID                                    {$$ = new Tipo(Tipos.VOID);}
 ;
 
 
@@ -290,268 +350,14 @@ EXPRESION : '-' EXPRESION %prec UMENOS	  {$$ = new Aritmetica($2, null, '-', @1.
           | '!' EXPRESION	              {$$ = new Logica($2, null, '!', @1.first_line, @1.first_column);}
           | EXPRESION '||' EXPRESION	  {$$ = new Logica($1, $3, '||', @1.first_line, @1.first_column);}
           | EXPRESION '&&' EXPRESION	  {$$ = new Logica($1, $3, '&&', @1.first_line, @1.first_column);}
+          | TERNARIO                      {$$ = $1;}
+          | USOFUNCION                    {$$ = $1;}
           | TK_NUMERO				      {$$ = new Primitivo(new Tipo(Tipos.NUMBER), Number($1), @1.first_line, @1.first_column);}
           | TK_TRUE				          {$$ = new Primitivo(new Tipo(Tipos.BOOLEAN), true, @1.first_line, @1.first_column);}
           | TK_FALSE				      {$$ = new Primitivo(new Tipo(Tipos.BOOLEAN), false, @1.first_line, @1.first_column);}
           | TK_CADENAC			          {$$ = new Primitivo(new Tipo(Tipos.STRING), $1.slice(1, -1).replace(/\\"/g,"\""), @1.first_line, @1.first_column);}
-          | TK_CADENAS			          { $$ = new Primitivo(new Tipo(Tipos.STRING), $1.slice(1, -1).replace(/\\'/g,"'"), @1.first_line, @1.first_column);}
+          | TK_CADENAS			          {$$ = new Primitivo(new Tipo(Tipos.STRING), $1.slice(1, -1).replace(/\\'/g,"'"), @1.first_line, @1.first_column);}
           | TK_ID			              {$$ = new Identificador($1, null, null, @1.first_line, @1.first_column);}
-          /*| TK_VOID			              {$$ = new Identificador($1, @1.first_line, @1.first_column);}*/
           | '(' EXPRESION ')'		      {$$ = $2;}
 ;
 
-/*
-//Listado de senetencias
-SENTENCIAS: SENTENCIAS SENTENCIA  {$$ = $1; $$.push($2);}
-          | SENTENCIA             {$$ = []; $$.push($1);}
-;
-
-//Tipo de sentencias principales
-SENTENCIA: CLASS                        {$$ = new NodoAST.NodoAST( id++, "Clase", @1.first_line, @1.first_column, $1);}
-         | IMPORT                       {$$ = new NodoAST.NodoAST( id++, "Import", @1.first_line, @1.first_column, $1);}
-         | COMENTARIOS                  {$$ = new NodoAST.NodoAST( id++, "Comentario", @1.first_line, @1.first_column, $1);}
-         | ERR                          {$$ = new NodoAST.NodoAST( id++, "ERROR", @1.first_line, @1.first_column, []); errores.push($1);}
-;
-
-//Sentencias principales no derivables
-IMPORT: TK_IMPORT TK_ID ';'                 {$$ = [new NodoAST.NodoAST(id++, $2, @1.first_line, @1.first_column, [])];}
-;
-
-COMENTARIOS: TK_CM                      {$$ = [new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, [])];}
-           | TK_CL                      {$$ = [new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, [])];}
-;
-
-//Sentencia principal derivable
-CLASS: TK_CLASS TK_ID '{' TODOCLASE '}'         {$$ = [new NodoAST.NodoAST(id++, $2, @1.first_line, @1.first_column, []), $4];}
-     | TK_CLASS TK_ID '{' '}'                   {$$ = [new NodoAST.NodoAST(id++, $2, @1.first_line, @1.first_column, [])];}
-;            
-
-TODOCLASE: TODOS            {$$ = new NodoAST.NodoAST( id++, "Sentencias", @1.first_line, @1.first_column, $1);}
-;
-
-TODOS: TODOS TODO       {$$ = $1; $$.push($2);}
-     | TODO             {$$ = []; $$.push($1);}
-;
-
-//Todo tipo de funcion posible dentro de sentencia principal
-TODO: COMENTARIOS       {$$ = new NodoAST.NodoAST( id++, "Comentario", @1.first_line, @1.first_column, $1);}
-    | METODO            {$$ = new NodoAST.NodoAST( id++, "Metodo", @1.first_line, @1.first_column, $1);}
-    | FUNCION           {$$ = new NodoAST.NodoAST( id++, "Funcion", @1.first_line, @1.first_column, $1);}
-    | MAIN              {$$ = new NodoAST.NodoAST( id++, "Main", @1.first_line, @1.first_column, $1);}
-    | DECLARACION       {$$ = new NodoAST.NodoAST( id++, "Declaracion", @1.first_line, @1.first_column, $1);}
-    | ASIGNACION        {$$ = new NodoAST.NodoAST( id++, "Asignacion", @1.first_line, @1.first_column, $1);}
-    | ERR               {$$ = new NodoAST.NodoAST( id++, "ERROR", @1.first_line, @1.first_column, []); errores.push($1);}
-;
-
-//Creacion de metodos funicones o main
-METODO: VOID TK_ID '(' PARAMETROSGENERAL ')' '{' TODOGENERAL '}'  {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $4, $7];}
-      | VOID TK_ID '(' PARAMETROSGENERAL ')' '{' '}'              {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $4];}
-      | VOID TK_ID '(' ')' '{' TODOGENERAL '}'                    {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $6];}
-      | VOID TK_ID '(' ')' '{' '}'                                {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, [])];}
-;
-
-FUNCION: TIPO TK_ID '(' PARAMETROSGENERAL ')' '{' TODOGENERAL '}'  {$$ = [$1, new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $4, $7];}
-       | TIPO TK_ID '(' PARAMETROSGENERAL ')' '{' '}'              {$$ = [$1, new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $4];}
-       | TIPO TK_ID '(' ')' '{' TODOGENERAL '}'                    {$$ = [$1, new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $6];}
-       | TIPO TK_ID '(' ')' '{' '}'                                {$$ = [$1, new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, [])];}
-;
-
-MAIN: VOID TK_MAIN '(' ')' '{' TODOGENERAL '}'       {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, []), $6];}
-    | VOID TK_MAIN '(' ')' '{' '}'                   {$$ = [$1,new NodoAST.NodoAST( id++, $2, @1.first_line, @1.first_column, [])];}
-;
-
-VOID: TK_VOID           {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-;
-
-//Estructura de creacion de parametros
-PARAMETROSGENERAL: PARAMETROS        {$$ = new NodoAST.NodoAST( id++, "Parametros", @1.first_line, @1.first_column, $1);}
-;
-
-PARAMETROS: PARAMETROS ',' PARAMETRO   {$$ = $1; $$.push($3);}
-          | PARAMETRO                  {$$ = []; $$.push($1);}
-;
-
-PARAMETRO: TIPO TK_ID            {$1.lista = [new NodoAST.NodoAST( id++, $2, @2.first_line, @2.first_column, [])]; $$ = $1;}
-;
-
-//Identificacion de tipos de dato
-TIPO: TK_INT        {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-    | TK_DOUBLE     {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-    | TK_BOOLEAN    {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-    | TK_STRING     {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-    | TK_CHAR       {$$ = new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []);}
-;
-
-//Estructura para la obtencion de sentencias no del tipo clase
-TODOGENERAL: TODOSDENTRO        {$$ = new NodoAST.NodoAST( id++, "Sentencias", @1.first_line, @1.first_column, $1);}
-;
-
-TODOSDENTRO: TODOSDENTRO TODODENTRO       {$$ = $1; $$.push($2);}
-           | TODODENTRO                   {$$ = [$1];}
-;
-
-//todo lo que va dentro de metodos funciones o main
-TODODENTRO: COMENTARIOS             {$$ = new NodoAST.NodoAST( id++, "Comentario", @1.first_line, @1.first_column, $1);}
-          | ASIGNACION              {$$ = new NodoAST.NodoAST( id++, "Asignacion", @1.first_line, @1.first_column, $1);}
-          | DECLARACION             {$$ = new NodoAST.NodoAST( id++, "Declaracion", @1.first_line, @1.first_column, $1);}
-          | FOR                     {$$ = new NodoAST.NodoAST( id++, "For", @1.first_line, @1.first_column, $1);}
-          | WHILE                   {$$ = new NodoAST.NodoAST( id++, "While", @1.first_line, @1.first_column, $1);}
-          | DO                      {$$ = new NodoAST.NodoAST( id++, "Do while", @1.first_line, @1.first_column, $1);}
-          | SWITCH                  {$$ = new NodoAST.NodoAST( id++, "Switch", @1.first_line, @1.first_column, $1);}
-          | IF                      {$$ = new NodoAST.NodoAST( id++, "If", @1.first_line, @1.first_column, $1);}
-          | BCR                     {$$ = $1;}
-          | LLAMADAF                {$$ = new NodoAST.NodoAST( id++, "Llamada funcion", @1.first_line, @1.first_column, [$1]);}
-          | PRINT                   {$$ = new NodoAST.NodoAST( id++, "Print", @1.first_line, @1.first_column, [$1]);}
-          | ERR                     {$$ = new NodoAST.NodoAST( id++, "ERROR", @1.first_line, @1.first_column, []); errores.push($1);}
-;
-
-BCR: TK_BREAK ';'                  {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-   | TK_CONTINUE ';'               {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-   | TK_RETURN SEXPRECION ';'      {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, [$2]);}
-;
-
-PRINT: TK_SYSTEM '.' TK_OUT '.' TK_PRINT '(' SEXPRECION ')' ';'         {$$ = $7;}
-     | TK_SYSTEM '.' TK_OUT '.' TK_PRINTLN '(' SEXPRECION ')' ';'       {$$ = $7;}
-;
-//Estructura de declaraciones
-DECLARACION: TIPO LISTA '=' EXPRECION ';'        {$1.lista = $2; $$ = [$1, $4];}
-           | TIPO LISTA ';'                      {$1.lista = $2; $$ = [$1];}
-;
-
-LISTA: LISTA ',' TK_ID        {$$ = $1; $$.push(new NodoAST.NodoAST( id++, $3, @3.first_line, @3.first_column, []));}
-     | TK_ID                  {$$ = []; $$.push(new NodoAST.NodoAST( id++, $1, @1.first_line, @1.first_column, []));}
-;
-
-//expreciones
-EXPRECION: EXPRECIONES        {$$ = new NodoAST.NodoAST( id++, "=", @1.first_line, @1.first_column, $1);}
-;
-
-EXPRECIONES: EXPRECIONES E   {$$ = $1; $$.push($2);}
-           | E               {$$ = [$1];}   
-;
-
-E: E '+' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | E '-' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | E '*' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | E '/' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | E '^' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | E '%' E                  {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- //| '-' E %prec UMINUS       {$$ = new NodoAST.NodoAST(id, $1, @1.first_line, @1.first_column, [$2]); id++;}
- | '(' E ')'                {$$ = $2;}
- | VALORES                  {$$ = $1;}
-;
-
-VALORES: TK_CD      {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-       | TK_CH      {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-       | TK_ID      {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-       | TK_NM      {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-       | TK_BOOL    {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-;
-
-//llamada de funciones no implementado
-LLAMADAF: TK_ID '(' SEXPRECION ')' ';'     {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, [$3]);}
-        | TK_ID '(' ')' ';'                 {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []);}
-;
-
-//Estructura de asignacion
-ASIGNACION: TK_ID '=' EXPRECION ';'         {$$ = [new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, []), $3];}
-;
-
-
-//estructura for $3, $4, $6, $9
-FOR: TK_FOR '(' DECASIG CONDICIONES ';' ITERADORES ')' '{' TODOGENERAL '}'      {$$ = [$3, $4, $6, $9];}
-   | TK_FOR '(' DECASIG CONDICIONES ';' ITERADORES ')' '{' '}'                  {$$ = [$3, $4, $6];}
-;
-
-//declaracion o asignacion
-DECASIG: ASIGNACION              {$$ = new NodoAST.NodoAST( id++, "Asignacion", @1.first_line, @1.first_column, $1);}
-       | DECLARACION             {$$ = new NodoAST.NodoAST( id++, "Declaracion", @1.first_line, @1.first_column, $1);}
-;   
-
-//condicion de for
-CONDICIONES: CONDICION  {$$ = new NodoAST.NodoAST(id++, "Condiciones", @1.first_line, @1.first_column, $1);}
-;
-
-CONDICION: CONDICION C  {$$ = $1; $$.push($2);}
-         | C            {$$ = [$1];} 
-;
-
-C: C '&&' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '||' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | '(' C ')'        {$$ = $2}
- | C '<' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '<=' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '>' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '>=' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '!=' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '==' C         {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '+' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '-' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '*' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '/' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '^' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | C '%' C          {$$ = new NodoAST.NodoAST(id++, $2, @2.first_line, @2.first_column, [$1, $3]);}
- | '!' C            {$$ = new NodoAST.NodoAST(id++, $1, @1.first_line, @1.first_column, [$2]);}
- | VALORES          {$$ = $1}
- //| EXPRECIONES      {$$ = new NodoAST.NodoAST(id++, "Exprecion", @1.first_line, @1.first_column, $1);}
-;
-
-//iterador de for
-ITERADORES: ITERADOR    {$$ = new NodoAST.NodoAST(id++, "Iterador", @1.first_line, @1.first_column, $1);}
-;
-
-ITERADOR: TK_ID '++'   {$$ = [new NodoAST.NodoAST(id++, $1+$2, @1.first_line, @1.first_column, [])];}
-        | TK_ID '--'   {$$ = [new NodoAST.NodoAST(id++, $1+$2, @1.first_line, @1.first_column, [])];}
-;
-
-
-//estructura de while
-WHILE: TK_WHILE '(' CONDICIONES ')' '{' TODOGENERAL '}'        {$$ = [$3, $6]}
-     | TK_WHILE '(' CONDICIONES ')' '{' '}'                    {$$ = [$3]}
-;
-
-//estructura do while
-DO: TK_DO '{' TODOGENERAL '}' TK_WHILE '(' CONDICIONES ')' ';'       {$$ = [$3, $7]}
-  | TK_DO '{' '}' TK_WHILE '(' CONDICIONES ')' ';'                   {$$ = [$6]}
-;
-
-
-//estructura if
-IF: TKIF ELSEL        {$$ = $2; $$.unshift($1);}
-  | TKIF              {$$ = [$1];}
-;
-
-TKIF: TK_IF '(' CONDICIONES ')' '{' TODOGENERAL '}'            {$$ = new NodoAST.NodoAST(id++, "if", @1.first_line, @1.first_column, [$3, $6]);}
-    | TK_IF '(' CONDICIONES ')' '{' '}'                        {$$ = new NodoAST.NodoAST(id++, "if", @1.first_line, @1.first_column, [$3]);}
-;
-
-ELSEL: ELSEL ELSE           {$$ = $1; $$.push($2);}
-     | ELSE                 {$$ = [$1];}
-;
-
-ELSE: TK_ELSE TKIF                      {$$ = new NodoAST.NodoAST(id++, "else if", @1.first_line, @1.first_column, $2.lista);}
-    | TK_ELSE '{' TODOGENERAL '}'       {$$ = new NodoAST.NodoAST(id++, "else", @1.first_line, @1.first_column, [$3]);}
-    | TK_ELSE '{' '}'                   {$$ = new NodoAST.NodoAST(id++, "else", @1.first_line, @1.first_column, []);}
-;
-
-//estructura whitch
-SWITCH: TK_SWITCH '(' SEXPRECION ')' '{' CASS '}'      {$$ = [$3, $6];}
-      | TK_SWITCH '(' SEXPRECION ')' '{' '}'            {$$ = [$3];}
-;
-
-SEXPRECION: EXPRECIONES        {$$ = new NodoAST.NodoAST( id++, "Exprecion", @1.first_line, @1.first_column, $1);}
-;
-
-CASS: CASES        {$$ = new NodoAST.NodoAST( id++, "Cases", @1.first_line, @1.first_column, $1);}
-;
-
-CASES: CASES CASE       {$$ = $1; $$.push($2);}
-     | CASE             {$$ = [$1];}
-;
-
-CASE: TK_CASE VALORES ':' TODOGENERAL   {$$ = new NodoAST.NodoAST( id++, "Case", @1.first_line, @1.first_column, [$2, $4]);}
-    | TK_CASE VALORES ':'               {$$ = new NodoAST.NodoAST( id++, "Case", @1.first_line, @1.first_column, [$2]);}
-    | TK_DEFAULT ':' TODOGENERAL        {$$ = new NodoAST.NodoAST( id++, "Default", @1.first_line, @1.first_column, [$3]);}
-    | TK_DEFAULT ':'                    {$$ = new NodoAST.NodoAST( id++, "Default", @1.first_line, @1.first_column, []);}
-;
-*/
