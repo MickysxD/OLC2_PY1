@@ -32,12 +32,10 @@ export class Ternario extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
         const nuevoEntorno = new Tabla(tabla);
         let result:NodoAST;
         result = this.condicion.ejecutar(nuevoEntorno, ast);
         if (result instanceof Error) {
-            retorno = result;
             return result;
         }
 
@@ -45,22 +43,18 @@ export class Ternario extends NodoAST {
             const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }
 
         if (result) {
             const res = this.primero.ejecutar(nuevoEntorno, ast);
-            retorno = res;
             return res;
             
         } else {
             const res = this.segundo.ejecutar(nuevoEntorno, ast);
-            retorno = res;
             return res;
             
         }
 
-        return retorno;
     }
 }

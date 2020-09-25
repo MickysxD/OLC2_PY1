@@ -5,6 +5,7 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
+import { Return } from "../Expresion/Return";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -30,7 +31,6 @@ export class While extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
         let enciclado = 0;
 
         for (let index = 0; index <= 5000; index++){
@@ -38,7 +38,6 @@ export class While extends NodoAST {
             let result:NodoAST;
             result = this.condicion.ejecutar(nuevoEntorno, ast);
             if (result instanceof Error) {
-                retorno = result;
                 return result;
             }
 
@@ -46,24 +45,22 @@ export class While extends NodoAST {
                 const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
                 ast.errores.push(error);
                 //ast.consola.push(error.toString());
-                retorno = error;
                 return error;
             }
 
             if (result) {
-                if(this.sentencias != null){
-                    this.sentencias.map((m) =>{
-                        const res = m.ejecutar(nuevoEntorno, ast);
-                        if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                            index = 5000;
-                            retorno = res;
-                            return res;
-                        }
-                    });
-                    if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                        return retorno;
+                for(let i = 0; i < this.sentencias.length; i++){
+                    let m = this.sentencias[i];
+                    const res = m.ejecutar(nuevoEntorno, ast);
+                    if(res instanceof Continue || res instanceof Break || res instanceof Error || res instanceof Return){
+                        index = 5000;
+                        return res;
+                    }
+                    if(m instanceof Return){
+                        return m;
                     }
                 }
+                
             }else{
                 break;
             }
@@ -75,10 +72,9 @@ export class While extends NodoAST {
             const error = new Error("Semantico", "Se ha enciclado la sentencia While", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }else{
-            return retorno;
+            return null;
         }
     }
 }

@@ -16,6 +16,7 @@ import { Relacional } from "./Ejecucion/Expresion/Relacional";
 import { Identificador } from "./Ejecucion/Expresion/Identificador";
 import { Continue } from "./Ejecucion/Expresion/Continue";
 import { Break } from "./Ejecucion/Expresion/Break";
+import { Return } from "./Ejecucion/Expresion/Return";
 
 //Carpeta Instruccion
 import { ConsoleLog } from "./Ejecucion/Instruccion/ConsoleLog";
@@ -29,6 +30,7 @@ import { Switch } from './Ejecucion/Instruccion/Switch';
 import { Case } from './Ejecucion/Instruccion/Case';
 import { Ternario } from './Ejecucion/Instruccion/Ternario';
 import { Funcion } from './Ejecucion/Instruccion/Funcion';
+import { UsoFuncion } from './Ejecucion/Instruccion/UsoFuncion';
 
 //Analizador
 var parser  = require("./Ejecucion/gramatica.js");

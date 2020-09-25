@@ -3,6 +3,7 @@ import { Tabla } from "../AST/Tabla";
 import { AST } from "../AST/AST";
 import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
+import { Return } from './Return';
 
 /**
  * @class Genera un nuevo nodo expresion para realizar operaciones logicas

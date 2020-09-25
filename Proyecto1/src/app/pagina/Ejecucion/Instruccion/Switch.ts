@@ -6,6 +6,7 @@ import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
 import { Case } from "./Case";
+import { Return } from "../Expresion/Return";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -31,12 +32,10 @@ export class Switch extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
         const nuevoEntorno = new Tabla(tabla);
         let result:NodoAST;
         result = this.condicion.ejecutar(nuevoEntorno, ast);
         if (result instanceof Error) {
-            retorno = result;
             return result;
         }
 
@@ -44,58 +43,56 @@ export class Switch extends NodoAST {
             const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }
 
-        if(this.cases != null){
-            this.cases.map((m:Case) =>{
-                if(m.esDefault != true){
-                    let resultC:NodoAST;
-                    resultC = m.condicion.ejecutar(nuevoEntorno, ast);
-                    if (resultC instanceof Error) {
-                        retorno = resultC;
-                        return resultC;
-                    }
-
-                    if (this.condicion.tipo.tipo != m.condicion.tipo.tipo) {
-                        const error = new Error("Semantico", "Los tipos no coinciden sentencia Switch", this.fila, this.columna);
-                        ast.errores.push(error);
-                        //ast.consola.push(error.toString());
-                        retorno = error;
-                        return error;
-                    }
-
-                    if(resultC == result){
-                        const res = m.ejecutar(nuevoEntorno, ast);
-                        if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                            retorno = res;
-                            return res;
-                        }
-                    }
+        for(let i = 0; i < this.cases.length; i++){
+            let m = this.cases[i];
+            if(m instanceof Case && m.esDefault != true){
+                let resultC:NodoAST;
+                resultC = m.condicion.ejecutar(nuevoEntorno, ast);
+                if (resultC instanceof Error) {
+                    return resultC;
                 }
-            });
 
-            if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                return retorno;
-            }
+                if (this.condicion.tipo.tipo != m.condicion.tipo.tipo) {
+                    const error = new Error("Semantico", "Los tipos no coinciden sentencia Switch", this.fila, this.columna);
+                    ast.errores.push(error);
+                    //ast.consola.push(error.toString());
+                    return error;
+                }
 
-            this.cases.map((m:Case) =>{
-                if(m.esDefault == true){
+                if(resultC == result){
                     const res = m.ejecutar(nuevoEntorno, ast);
-                    if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                        retorno = res;
+                    
+                    if(res instanceof Break){
+                        return null;
+                    }
+                    if(res instanceof Continue || res instanceof Error || res instanceof Return){
                         return res;
                     }
+                    
+                    if(m instanceof Return){
+                        return m;
+                    }
                 }
-            });
-
-            if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                return retorno;
             }
         }
 
-        return retorno;
+        for(let i = 0; i < this.cases.length; i++){
+            let m = this.cases[i];
+            if(m instanceof Case && m.esDefault == true){
+                const res = m.ejecutar(nuevoEntorno, ast);
+                if(res instanceof Continue || res instanceof Break || res instanceof Error || res instanceof Return){
+                    return res;
+                }
+                if(m instanceof Return){
+                    return m;
+                }
+            }
+        }
+
+        return null;
         
     }
 }

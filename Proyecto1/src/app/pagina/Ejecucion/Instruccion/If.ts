@@ -5,6 +5,7 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
+import { Return } from "../Expresion/Return";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -33,16 +34,15 @@ export class If extends NodoAST {
         this.sentenciasIF = sentenciasIF;
         this.listaIFS = listaIFS;
         this.sentenciasELSE = sentenciasELSE;
-        this.entro = null;
+        this.entro = false;
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
+        this.entro = false;
         const nuevoEntorno = new Tabla(tabla);
         let result:NodoAST;
         result = this.condicion.ejecutar(nuevoEntorno, ast);
         if (result instanceof Error) {
-            retorno = result;
             return result;
         }
 
@@ -50,62 +50,53 @@ export class If extends NodoAST {
             const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }
 
         if (result) {
-            if(this.sentenciasIF != null){
-                this.sentenciasIF.map((m) =>{
-                    const res = m.ejecutar(nuevoEntorno, ast);
-                    if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                        retorno = res;
-                        return res;
-                    }
-                });
-                this.entro = true;
-                if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                    return retorno;
+            for(let i = 0; i < this.sentenciasIF.length; i++){
+                let m = this.sentenciasIF[i];
+                const res = m.ejecutar(nuevoEntorno, ast);
+                if(res instanceof Continue || res instanceof Break || res instanceof Error || res instanceof Return){
+                    return res;
+                }
+                if(m instanceof Return){
+                    return m;
                 }
             }
+            this.entro = true;
             
         } else {
-            if(this.listaIFS != null){
-                this.listaIFS.map((m:If) =>{
+            for(let i = 0; i < this.listaIFS.length; i++){
+                let m = this.listaIFS[i];
+                if(m instanceof If){
                     const res = m.ejecutar(nuevoEntorno, ast);
-                    
                     if(m.entro){
                         this.entro = true;
-                        retorno = res;
                         return res;
                     }
-
-                    if (res instanceof Error) {
-                        retorno = res;
+                    if (res instanceof Error || res instanceof Return) {
                         return res;
                     }
-                });
-                if(retorno instanceof Error){
-                    return retorno;
                 }
             }
             
-            if(this.sentenciasELSE != null && !this.entro){
-                this.sentenciasELSE.map((m) =>{
+            if(!this.entro){
+                for(let i = 0; i < this.sentenciasELSE.length; i++){
+                    let m = this.sentenciasELSE[i];
                     const res = m.ejecutar(nuevoEntorno, ast);
-                    if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                        retorno = res;
+                    if(res instanceof Continue || res instanceof Break || res instanceof Error || res instanceof Return){
                         return res;
                     }
-                });
-                this.entro = true;
-                if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                    return retorno;
+                    if(m instanceof Return){
+                        return m;
+                    }
+                    this.entro = true;
                 }
             }
             
         }
 
-        return retorno;
+        return null;
     }
 }

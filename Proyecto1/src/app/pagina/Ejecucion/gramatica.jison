@@ -17,6 +17,7 @@
     var {Logica} = require("./Expresion/Logica");
     var {Continue} = require("./Expresion/Continue");
     var {Break} = require("./Expresion/Break");
+    var {Return} = require("./Expresion/Return");
     
     
     //Carpeta Instruccion
@@ -31,6 +32,7 @@
     var {Case} = require("./Instruccion/Case");
     var {Ternario} = require("./Instruccion/Ternario");
     var {Funcion} = require("./Instruccion/Funcion");
+    var {UsoFuncion} = require("./Instruccion/UsoFuncion");
 
 
     var errores = [];
@@ -59,11 +61,11 @@
 //Tipos de operadores
 "++"                            return '++';
 "--"                            return '--';
+"**"                            return '^';
 "+"                             return '+';
 "-"                             return '-';
 "*"                             return '*';
 "/"                             return '/';
-"^"                             return '^';
 "%"                             return '%';
 
 
@@ -201,12 +203,18 @@ INSTRUCCION: CONSOLE                        {$$ = $1;}
            | SWITCH                         {$$ = $1;}
            | BREAK                          {$$ = $1;}
            | CONTINUE                       {$$ = $1;}
+           | RETURN                         {$$ = $1;}
            | TERNARIO ';'                   {$$ = $1;}
            | FUNCION                        {$$ = $1;}
            | USOFUNCION ';'                 {$$ = $1;}
+           | COMENTARIO                     {}
            /*| ERROR                        {$$ = $1;}*/
 ;
 
+//Comentarios
+COMENTARIO: TK_CL                           {}
+          | TK_CM                           {}
+;
 
 //Console.log
 CONSOLE: TK_CONSOLE CONDICION ';'              {$$ = new ConsoleLog($2, @1.first_line, @1.first_column);}
@@ -220,9 +228,14 @@ BREAK: TK_BREAK ';'                            {$$ = new Break(@1.first_line, @1
 CONTINUE: TK_CONTINUE ';'                      {$$ = new Continue(@1.first_line, @1.first_column);}
 ;
 
+//Return
+RETURN: TK_RETURN EXPRESION ';'                {$$ = new Return($2, @1.first_line, @1.first_column);}
+      | TK_RETURN ';'                          {$$ = new Return(null, @1.first_line, @1.first_column);}
+;
+
 //Declaracion y su listado
-DECLARACION: TK_CONST LISTA_DECLARACION     {$$ = new Declaracion(true, $2);}
-           | TK_LET LISTA_DECLARACION       {$$ = new Declaracion(false, $2);}
+DECLARACION: TK_CONST LISTA_DECLARACION     {$$ = new Declaracion(true, $2, @1.first_line, @1.first_column);}
+           | TK_LET LISTA_DECLARACION       {$$ = new Declaracion(false, $2, @1.first_line, @1.first_column);}
 ;
 
 LISTA_DECLARACION: LISTA_DECLARACION ',' ID_DECLARACION      {$$ = $1; $$.push($3);}
@@ -237,7 +250,7 @@ ID_DECLARACION: TK_ID ':' TIPO '=' EXPRESION			     {$$ = new Identificador($1, 
 
 
 //Asignacion y su listado
-ASIGNACION: LISTA_ASIGNACION                             {$$ = new Asignacion($1);}
+ASIGNACION: LISTA_ASIGNACION                             {$$ = new Asignacion($1, @1.first_line, @1.first_column);}
 ;
 
 LISTA_ASIGNACION: LISTA_ASIGNACION ',' ID_ASIGNACION         {$$ = $1; $$.push($2);}
@@ -252,9 +265,9 @@ ID_ASIGNACION: TK_ID '=' EXPRESION        {$$ = new Identificador($1, null, $3, 
 
 //If y listas
 IF: TK_IF CONDICION BLOQUE_INSTRUCCIONES LISTA_IF TK_ELSE BLOQUE_INSTRUCCIONES  {$$ = new If($2, $3, $4, $6, @1.first_line, @1.first_column);}
-  | TK_IF CONDICION BLOQUE_INSTRUCCIONES LISTA_IF                               {$$ = new If($2, $3, $4, null, @1.first_line, @1.first_column);}
-  | TK_IF CONDICION BLOQUE_INSTRUCCIONES TK_ELSE BLOQUE_INSTRUCCIONES           {$$ = new If($2, $3, null, $6, @1.first_line, @1.first_column);}
-  | TK_IF CONDICION BLOQUE_INSTRUCCIONES                                        {$$ = new If($2, $3, null, null, @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES LISTA_IF                               {$$ = new If($2, $3, $4, [], @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES TK_ELSE BLOQUE_INSTRUCCIONES           {$$ = new If($2, $3, [], $5, @1.first_line, @1.first_column);}
+  | TK_IF CONDICION BLOQUE_INSTRUCCIONES                                        {$$ = new If($2, $3, [], [], @1.first_line, @1.first_column);}
 ;
 
 CONDICION: '(' EXPRESION ')'        {$$ = $2;}
@@ -268,7 +281,7 @@ LISTA_IF: LISTA_IF ELSE_IF             {$$ =$1; $$.push($2);}
         | ELSE_IF                      {$$ = [$1];}
 ;
 
-ELSE_IF: TK_ELSE TK_IF CONDICION BLOQUE_INSTRUCCIONES          {$$ = new If($3, $4, null, null, @1.first_line, @1.first_column);}
+ELSE_IF: TK_ELSE TK_IF CONDICION BLOQUE_INSTRUCCIONES          {$$ = new If($3, $4, [], [], @1.first_line, @1.first_column);}
 ;
 
 
@@ -282,6 +295,7 @@ DOWHILE: TK_DO BLOQUE_INSTRUCCIONES TK_WHILE CONDICION ';'     {$$ = new DoWhile
 
 //Swich case
 SWITCH: TK_SWITCH EXPRESION '{' LISTA_CASE '}'                  {$$ = new Switch($2, $4, $3, @1.first_line, @1.first_column);}
+      | TK_SWITCH EXPRESION '{' '}'                             {$$ = new Switch($2, $4, [], @1.first_line, @1.first_column);}
 ;
 
 LISTA_CASE: LISTA_CASE CASE                                     {$$ = $1; $$.push($2)}
@@ -299,14 +313,18 @@ TERNARIO: EXPRESION '?' EXPRESION ':' EXPRESION        {$$ = new Ternario($1, $3
 
 
 //For
-FOR: TK_FOR '(' DECLARACION ';' EXPRESION ';' ASIGNACION ')' BLOQUE_INSTRUCCIONES     {$$ = new For($3, $5, $6, $8, @1.first_line, @1.first_column);}
+FOR: TK_FOR '(' DECLARACION ';' EXPRESION ';' ASIGNACION ')' BLOQUE_INSTRUCCIONES     {$$ = new For($3, $5, $7, $9, @1.first_line, @1.first_column);}
    | TK_FOR '(' ASIGNACION ';' EXPRESION ';' ASIGNACION ')' BLOQUE_INSTRUCCIONES      {$$ = new For($3, $5, $7, $9, @1.first_line, @1.first_column);}
 ;
 
 
 //Funciones
-FUNCION: TK_FUNCTION TK_ID '(' LISTA_PARAMETROS ')' ':' TIPO '{' INSTRUCCIONES '}'        {$$ = new Funcion($2, $4, $7, $9, @1.first_line, @1.first_column);}
-       | TK_FUNCTION TK_ID '(' LISTA_PARAMETROS ')' '{' INSTRUCCIONES '}'                 {$$ = new Funcion($2, $4, new Tipo(Tipos.VOID), $7, @1.first_line, @1.first_column);}
+FUNCION: TK_FUNCTION TK_ID PFUNCION ':' TIPO BLOQUE_INSTRUCCIONES        {$$ = new Funcion($2, $3, $5, $6, @1.first_line, @1.first_column);}
+       | TK_FUNCTION TK_ID PFUNCION BLOQUE_INSTRUCCIONES                 {$$ = new Funcion($2, $3, new Tipo(Tipos.VOID), $4, @1.first_line, @1.first_column);}
+;
+
+PFUNCION: '(' LISTA_PARAMETROS ')'                          {$$ = $2;}
+        | '(' ')'                                           {$$ = [];}
 ;
 
 LISTA_PARAMETROS: LISTA_PARAMETROS ',' PARAMETRO            {$$ = $1; $$.push($3);}
@@ -317,13 +335,14 @@ PARAMETRO: TK_ID ':' TIPO                                     {$$ = new Identifi
 ;
 
 //UsoFuncion
-USOFUNCION: TK_ID '(' LISTA_IDS ')'                      {$$ = new UsoFuncion($1, $2, @1.first_line, @1.first_column);}
-          | TK_ID '(' ')'                                {$$ = new UsoFuncion($1, null, @1.first_line, @1.first_column);}
+USOFUNCION: TK_ID '(' LISTA_IDS ')'                      {$$ = new UsoFuncion($1, $3, @1.first_line, @1.first_column);}
+          | TK_ID '(' ')'                                {$$ = new UsoFuncion($1, [], @1.first_line, @1.first_column);}
 ;
 
 LISTA_IDS: LISTA_IDS ',' EXPRESION                       {$$ = $1; $$.push($3);}
          | EXPRESION                                     {$$ = [$1];}
 ;
+
 
 //Tipos de datos de variables y funciones
 TIPO: TK_STRING                                  {$$ = new Tipo(Tipos.STRING);}

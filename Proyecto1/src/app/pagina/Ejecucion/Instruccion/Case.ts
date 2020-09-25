@@ -5,6 +5,7 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
+import { Return } from "../Expresion/Return";
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -32,19 +33,19 @@ export class Case extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
         const nuevoEntorno = new Tabla(tabla);
 
-        if(this.sentencias != null){
-            this.sentencias.map((m) =>{
-                const res = m.ejecutar(nuevoEntorno, ast);
-                if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                    retorno = res;
-                    return res;
-                }
-            });
+        for(let i = 0; i < this.sentencias.length; i++){
+            let m = this.sentencias[i];
+            const res = m.ejecutar(nuevoEntorno, ast);
+            if(res instanceof Continue || res instanceof Break || res instanceof Error || res instanceof Return){
+                return res;
+            }
+            if(m instanceof Return){
+                return m;
+            }
         }
 
-        return retorno;
+        return null;
     }
 }

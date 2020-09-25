@@ -35,14 +35,15 @@ export class Funcion extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
-        
         let nombre = "function_"+this.identificador;
-
-        if(this.parametros != null){
-            this.parametros.map((m:Identificador) =>{
-                nombre += "_" + m.tipo.tipo;
-            });
+/*
+        this.parametros.map((m:Identificador) =>{
+            nombre += "_" + m.tipo.tipo;
+        });
+*/
+        for(let i = 0; i < this.parametros.length; i++){
+            let m = this.parametros[i];
+            nombre += '_' + m.tipo.tipo;
         }
 
         let simbolo:Simbolo;
@@ -52,10 +53,9 @@ export class Funcion extends NodoAST {
             const error = new Error("Semantico", res, this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }
 
-        return retorno;
+        return null;
     }
 }

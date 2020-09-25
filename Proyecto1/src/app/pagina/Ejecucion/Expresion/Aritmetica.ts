@@ -3,6 +3,7 @@ import { Tabla } from "../AST/Tabla";
 import { AST } from "../AST/AST";
 import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
+import { Return } from './Return';
 
 /**
  * @class Genera un nuevo nodo expresion para realizar operaciones aritmeticas
@@ -93,15 +94,7 @@ export class Aritmetica extends NodoAST {
             }else if(this.operacion == '^'){
                 if(this.izquierdo.tipo.tipo == Tipos.NUMBER && this.derecho.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);
-                    if(operacionDer == 0){
-                        return 1;
-                    }else{
-                        let numero = operacionIzq;
-                        for (let index = 0; index < operacionDer-1; index++) {
-                            numero = numero*operacionIzq;   
-                        }
-                        return numero;
-                    }
+                    return operacionIzq ** operacionDer;
                     //return operacionIzq ^ operacionDer;
                 }else{
                     const error = new Error("Semantico","Error de Tipos -> se esta tratando de elevar " + this.izquierdo.tipo.toString() + " y " + this.derecho.tipo.toString(), this.fila, this.columna);
@@ -127,11 +120,11 @@ export class Aritmetica extends NodoAST {
             }
 
         }else{
-            let operacionIzq = this.izquierdo.ejecutar(tabla, ast);
+            const operacionIzq = this.izquierdo.ejecutar(tabla, ast);
             if(operacionIzq instanceof Error){
                 return operacionIzq;
             }
-            
+
             if(this.operacion == '-'){
                 if (this.izquierdo.tipo.tipo == Tipos.NUMBER){
                     this.tipo = new Tipo(Tipos.NUMBER);

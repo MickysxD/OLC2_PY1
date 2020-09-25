@@ -36,7 +36,6 @@ export class For extends NodoAST {
     }
 
     ejecutar(tabla:Tabla, ast:AST){
-        let retorno = null;
         const entorno = new Tabla(tabla);
         if(this.comienzo instanceof Declaracion || this.comienzo instanceof Asignacion){
             this.comienzo.ejecutar(entorno, ast);
@@ -44,7 +43,6 @@ export class For extends NodoAST {
             const error = new Error("Semantico", "Se esperaba una asignacion o declaracion en la sentencia For", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }
 
@@ -55,7 +53,6 @@ export class For extends NodoAST {
             let result:NodoAST;
             result = this.condicion.ejecutar(entorno, ast);
             if (result instanceof Error) {
-                retorno = result;
                 return result;
             }
 
@@ -63,24 +60,19 @@ export class For extends NodoAST {
                 const error = new Error("Semantico", "Se esperaba una expresion booleana para la condicion", this.fila, this.columna);
                 ast.errores.push(error);
                 //ast.consola.push(error.toString());
-                retorno = error;
                 return error;
             }
 
             if (result) {
-                if(this.sentencias != null){
-                    this.sentencias.map((m) =>{
-                        const res = m.ejecutar(nuevoEntorno, ast);
-                        if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                            index = 5000;
-                            retorno = res;
-                            return res;
-                        }
-                    });
-                    if(retorno instanceof Continue || retorno instanceof Break || retorno instanceof Error){
-                        return retorno;
+                for(let i = 0; i < this.sentencias.length; i++){
+                    let m = this.sentencias[i];
+                    const res = m.ejecutar(nuevoEntorno, ast);
+                    if(res instanceof Continue || res instanceof Break || res instanceof Error){
+                        index = 5000;
+                        return res;
                     }
                 }
+                
             }else{
                 break;
             }
@@ -93,10 +85,9 @@ export class For extends NodoAST {
             const error = new Error("Semantico", "Se ha enciclado la sentencia for", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
-            retorno = error;
             return error;
         }else{
-            return retorno;
+            return null;
         }
     }
 }
