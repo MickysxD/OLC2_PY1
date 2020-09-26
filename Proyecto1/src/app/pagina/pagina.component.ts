@@ -31,9 +31,11 @@ import { Case } from './Ejecucion/Instruccion/Case';
 import { Ternario } from './Ejecucion/Instruccion/Ternario';
 import { Funcion } from './Ejecucion/Instruccion/Funcion';
 import { UsoFuncion } from './Ejecucion/Instruccion/UsoFuncion';
+import { stringify } from 'querystring';
 
 //Analizador
 var parser  = require("./Ejecucion/gramatica.js");
+declare var generateTree;
 
 @Component({
   selector: 'app-pagina',
@@ -46,56 +48,20 @@ export class PaginaComponent implements OnInit {
     
   }
 
-  ast:AST;
-  tabla:Tabla;
-
-  texto(){
-    let a = '';
-    document.getElementById('txtEntrada').innerHTML = a;
-  }
-
-  errores(){
-    var infot2 = document.getElementById('salida');
-    infot2.setAttribute('class','card bg-transparent invisible');
-
-    var infot3 = document.getElementById('tablaErrores');
-    infot3.setAttribute('class','table table-hover visible');
-
-    var infot = document.getElementById('infoTabla');
-    var data="";
-    
-    if(this.ast != null){
-      this.ast.errores.map((m:Error) =>{
-        var tr = `<tr>
-          <td>`+m.tipo+`</td>
-          <td>`+m.descripcion+`</td>
-          <td>`+m.fila+`</td>
-          <td>`+m.columna+`</td>
-          </tr>`;
-          data += tr;
-      });
-    }
-
-    infot.innerHTML = data;
-
-}
+  entrada;
+  salida;
+  errores:Error[] = [];
+  ast:AST = null;
+  tabla:Tabla = null;
 
   ngOnInit(): void {
   }
 
   //aqui va todo el codigo xd
   exec(){
-    var infot2 = document.getElementById('salida');
-    infot2.setAttribute('class','card bg-light invisible');
-
-    var infot2 = document.getElementById('tablaErrores');
-    infot2.setAttribute('class','table table-striped invisible');
-
-    this.texto();
-
-    var entrada = (document.getElementById("txtEntrada") as HTMLInputElement).value;
+    //var entrada = (document.getElementById("txtEntrada") as HTMLInputElement).value;
     
-    let ast:AST = parser.parse(entrada);
+    let ast:AST = parser.parse(this.entrada);
     let tabla:Tabla= new Tabla(null);
     
     ast.instrucciones.map((m) =>{
@@ -125,22 +91,82 @@ export class PaginaComponent implements OnInit {
 
     //var json = JSON.stringify(ast,null,3);
     //console.log(json);
-    document.getElementById('txtSalida').innerHTML = a;
-
+    this.salida = a;
     this.ast = ast;
     this.tabla = tabla;
 
-    //json = json.split('lexema').join('text').split('lista').join('children').split('lista').join('children');
-    /*
-    var e = (document.getElementById("txtEntrada") as HTMLInputElement).value;
-    console.log("entro");
+    let root:Nodo = new Nodo("root", null, []);
+    let b:Nodo = root;
+    for (let index = 0; index < 10; index++) {
+      let c = new Nodo("Pto", b, []);
+      b.children.push(c);
+      b = c;
+    }
 
-    console.log(e);
-    document.getElementById('txtSalida').innerHTML = e;
+    this.root = root;
+  }
 
-    var ast = parser.parse(entrada);
-    */
+  root = null;
+  vast = true;
+  verAST(){
+    var tree = document.getElementById('ast');
+    if(this.vast && this.root != null){
+      generateTree([this.root]);
+      tree.setAttribute('class','card-group p-5 visible');
+      this.vast = false;
+    }else{
+      tree.setAttribute('class','card-group p-5 invisible');
+      document.getElementById("todoTree").innerHTML = "";
+      this.vast = true;
+    }
+  }
+
+  verrores = true;
+  verErrores(){
+    var tree = document.getElementById('errores');
+    if(this.verrores && this.ast != null){
+      for (let index = 0; index < this.ast.errores.length; index++) {
+        let error = this.ast.errores[index];
+        let tr = "<tr>";
+        tr += "<td>" + error.tipo + "</td>";
+        tr += "<td>" + error.descripcion + "</td>";
+        tr += "<td>" + error.fila + "</td>";
+        tr += "<td>" + error.columna + "</td>";
+        tr += "</tr>";
+        document.getElementById("infoTabla").innerHTML += tr ;
+      }
+      tree.setAttribute('class','card-group p-5 visible');
+      this.verrores = false;
+    }else{
+      document.getElementById("infoTabla").innerHTML = "" ;
+      tree.setAttribute('class','card-group p-5 invisible');
+      this.verrores = true;
+    }
+  }
+
+  traducir(){
+    let ast:AST = parser.parse(this.entrada);
+
+    for(let i = 0; i < ast.instrucciones.length; i++){
+      this.analizar(ast.instrucciones[i]);
+    }
+  }
+
+  analizar(m:NodoAST){
+
   }
 
 }
 
+class Nodo{
+  name:String;
+  parent:Nodo;
+  children:Nodo[];
+
+  constructor(name:string, parent:Nodo, children:Nodo[]){
+    this.name = name;
+    this.parent = parent;
+    this.children = children;
+  }
+
+}

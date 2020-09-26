@@ -48,10 +48,12 @@ export class Ternario extends NodoAST {
 
         if (result) {
             const res = this.primero.ejecutar(nuevoEntorno, ast);
+            this.tipo = this.primero.tipo;
             return res;
             
         } else {
             const res = this.segundo.ejecutar(nuevoEntorno, ast);
+            this.tipo = this.segundo.tipo;
             return res;
             
         }

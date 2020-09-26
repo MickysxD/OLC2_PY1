@@ -10,7 +10,8 @@
     <div  class="card bg-success">
         <h4 _ngcontent-srk-c16="" class="list-group-item list-group-item-primary text-center text-success bg-light">Entrada</h4>
         <div _ngcontent-srk-c16="" class="card-body p-3 mb-2 bg-transparent">
-            <textarea _ngcontent-srk-c16="" id="txtEntrada" rows="15" class="form-control ng-pristine ng-valid ng-touched bg-dark text-light"></textarea>
+            <ngx-codemirror [(ngModel)]="entrada" [options]="{ lineNumbers: true, theme: '3024-night', mode: 'javascript'}">
+            </ngx-codemirror>
         </div>
             <button _ngcontent-srk-c16="" (click)="exec()" type="button" id="btnEjecutar" class="btn p-2 mb-1 btn-outline-success btn-lg bg-warning text-light">Ejecutar</button>
             <button _ngcontent-srk-c16="" type="button" id="tbnTraducir" class="btn p-2 mb-1 btn-outline-success btn-lg bg-info text-light">Traducir</button>
@@ -18,17 +19,17 @@
     <div _ngcontent-srk-c16="" class="card bg-danger">
         <h4 _ngcontent-srk-c16="" class="list-group-item list-group-item-primary text-center text-danger bg-light">Salida</h4>
         <div _ngcontent-srk-c16="" class="card-body  bg-secondary btn-lg bg-danger">
-            <textarea _ngcontent-srk-c16="" readonly="" id="txtSalida" rows="15" class="form-control ng-pristine ng-valid ng-touched bg-dark text-light"></textarea>
+            <ngx-codemirror [(ngModel)]="salida" [options]="{ lineNumbers: true, theme: '3024-night', mode: 'javascript', readOnly: 'true'}">
+            </ngx-codemirror>    
         </div>
-            <button _ngcontent-srk-c16="" type="button" id="btnAST" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-primary text-light">AST</button>
-            <button _ngcontent-srk-c16="" (click)="errores()" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
-
+            <button _ngcontent-srk-c16="" (click)="verAST()" type="button" id="btnAST" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-primary text-light">AST</button>
+            <button _ngcontent-srk-c16="" (click)="verErrores()" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
     </div>
 </div>
 
-<div class="card-group p-5"  role="group">
-    <div  class="card invisible table-responsive"  id="salida">
-        <table class="table table-striped invisible" id="tablaErrores">
+<div class="card-group p-5 invisible"  role="group" id="errores">
+    <div  class="card table-responsive"  >
+        <table class="table table-bordered table-striped mb-5" id="tablaErrores">
             <thead>
                 <tr>
                     <th scope="col">Tipo</th>
@@ -38,9 +39,22 @@
                 </tr>
             </thead>
             
-            <tbody id="infoTabla">
-                
+            <tbody id="infoTabla" >
+                <!--><option *gnFor="let valor of this.errores">
+                    <tr>
+                        <th scope="col">{{valor.tipo}}</th>
+                        <th scope="col">{{valor.descripcion}}</th>
+                        <th scope="col">{{valor.fila}}</th>
+                        <th scope="col">{{volor.columna}}</th>
+                    </tr>
+                </option><-->
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="card-group p-5 invisible" role="group" id="ast">
+    <div _ngcontent-srk-c16="" class="card bg-info">
+        <svg id="todoTree"></svg>
     </div>
 </div>
