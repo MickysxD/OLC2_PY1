@@ -52,59 +52,109 @@ export class graficarAST{
 
     instruccion(m:NodoAST):Nodo{
       let padre = new Nodo("Instruccion", null, []);
+
       if(m instanceof Declaracion){
         padre.children.push(this.declaracion(m));
-        return padre;
 
       }else if(m instanceof Asignacion){
         padre.children.push(this.asignacion(m));
-        return padre;
 
       }else if(m instanceof ConsoleLog){
         padre.children.push(this.consolelog(m));
-        return padre;
         
       }else  if(m instanceof DoWhile){
         padre.children.push(this.dowhile(m));
-        return padre;
         
       }else if(m instanceof For){
         padre.children.push(this.for(m));
-        return padre;
         
       }else  if(m instanceof If){
         this.if(m, padre);
-        return padre;
         
       }else if(m instanceof Switch){
         padre.children.push(this.switch(m));
-        return padre;
         
       }else if(m instanceof While){
         padre.children.push(this.while(m));
-        return padre;
-        
-      }else if(m instanceof Ternario){
         
       }else if(m instanceof Break){
         padre.children.push(this.break(m));
-        return padre;
+
       }else if(m instanceof Continue){
         padre.children.push(this.continue(m));
-        return padre;
+
       }else if(m instanceof Return){
-        padre.children.push(this.return(m));
-        return padre;
+        padre.children.push(this.valor(m));
+
       }else if(m instanceof Funcion){
+        padre.children.push(this.funcion(m));
         
       }else if(m instanceof UsoFuncion){
+        padre.children.push(this.usofuncion(m));
         
       }
   
-      return new Nodo("ERROR", null, []);
+      return padre;
     }
 
-    while(m:DoWhile){
+    
+    usofuncion(m:UsoFuncion){
+      let padre = new Nodo("Uso de funcion "+m.identificador, null, []);
+      
+      let lista = new Nodo("Parametros", padre, []);
+      m.parametros.map((p) => {
+        lista.children.push(this.valor(p));
+      });
+      padre.children.push(lista);
+
+      return padre;
+    }
+
+    funcion(m:Funcion){
+      let padre = new Nodo("Funcion "+m.identificador, null, []);
+      
+      let lm = new Nodo("Lista de parametros", padre, []);
+
+      m.parametros.map((p) => {
+        let lista = new Nodo("Parametro", padre, []);
+        lista.children.push(this.valor(p));
+        lista.children.push(new Nodo("Tipo", padre, [new Nodo(p.tipo.toString(), padre, [])]));
+        lm.children.push(lista);
+      });
+      padre.children.push(lm);
+
+      if(m.tipo != null){
+        padre.children.push(new Nodo("Tipo", padre, [new Nodo(m.tipo.toString(), null, [])]));
+      }
+
+      let listas = new Nodo("Lista de instrucciones", padre, []);
+      m.sentencias.map((p) => {
+        listas.children.push(this.instruccion(p));
+      });
+      padre.children.push(listas);
+      
+      return padre;
+    }
+
+    ternario(m:Ternario){
+      let padre = new Nodo("Ternario", null, []);
+      
+      let w = new Nodo("Condicion", null, []);
+      w.children.push(this.valor(m.condicion));
+      padre.children.push(w);
+
+      let w1 = new Nodo("Eleccion 1", null, []);
+      w1.children.push(this.valor(m.primero));
+      padre.children.push(w1);
+
+      let w2 = new Nodo("Eleccion 2", null, []);
+      w2.children.push(this.valor(m.segundo));
+      padre.children.push(w2);
+      
+      return padre;
+    }
+
+    while(m:While){
       let padre = new Nodo("While", null, []);
       
       let w = new Nodo("Condicion", null, []);
@@ -261,7 +311,7 @@ export class graficarAST{
       m.declaraciones.map((p:Identificador) => {
         let d = new Nodo("declaracion", null, []);
         d.children.push(this.identificador(p));
-        if(p.tipo){
+        if(p.tipo != null){
           d.children.push(new Nodo("Tipo", padre, [new Nodo(p.tipo.toString(), null, [])]));
         }
         if(p.valor != null){
@@ -302,14 +352,22 @@ export class graficarAST{
     valor(m:NodoAST){
       if(m instanceof Aritmetica){
         return this.aritmetico(m);
+
       }else if(m instanceof Logica){
         return this.logica(m);
+
       }else if(m instanceof Relacional){
         return this.relacional(m);
+
       }else if(m instanceof Primitivo){
         return this.primitivo(m);
+
       }if(m instanceof Identificador){
         return this.identificador(m);
+
+      }if(m instanceof Ternario){
+        return this.ternario(m); 
+
       }
 
       return new Nodo("ERROR", null, []);

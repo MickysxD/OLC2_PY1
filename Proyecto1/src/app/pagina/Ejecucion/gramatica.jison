@@ -233,6 +233,7 @@ RETURN: TK_RETURN EXPRESION ';'                {$$ = new Return($2, @1.first_lin
       | TK_RETURN ';'                          {$$ = new Return(null, @1.first_line, @1.first_column);}
 ;
 
+
 //Declaracion y su listado
 DECLARACION: TK_CONST LISTA_DECLARACION     {$$ = new Declaracion(true, $2, @1.first_line, @1.first_column);}
            | TK_LET LISTA_DECLARACION       {$$ = new Declaracion(false, $2, @1.first_line, @1.first_column);}

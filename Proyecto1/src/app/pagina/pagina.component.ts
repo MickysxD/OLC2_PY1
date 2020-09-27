@@ -37,6 +37,10 @@ import { graficarAST,Nodo } from "./Ejecucion/graficarAST";
 
 import { stringify } from 'querystring';
 
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { PdfMakeWrapper, Table, Txt } from 'pdfmake-wrapper';
+import pdfMake from "pdfmake/build/pdfmake";
+
 //Analizador
 var parser  = require("./Ejecucion/gramatica.js");
 declare var generateTree;
@@ -61,6 +65,8 @@ export class PaginaComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  
 
   //aqui va todo el codigo xd
   exec(){
