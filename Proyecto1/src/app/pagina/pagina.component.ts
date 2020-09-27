@@ -31,6 +31,10 @@ import { Case } from './Ejecucion/Instruccion/Case';
 import { Ternario } from './Ejecucion/Instruccion/Ternario';
 import { Funcion } from './Ejecucion/Instruccion/Funcion';
 import { UsoFuncion } from './Ejecucion/Instruccion/UsoFuncion';
+
+//Funciones extra
+import { graficarAST,Nodo } from "./Ejecucion/graficarAST";
+
 import { stringify } from 'querystring';
 
 //Analizador
@@ -52,6 +56,7 @@ export class PaginaComponent implements OnInit {
   salida;
   errores:Error[] = [];
   ast:AST = null;
+  astR:AST = null;
   tabla:Tabla = null;
 
   ngOnInit(): void {
@@ -62,6 +67,7 @@ export class PaginaComponent implements OnInit {
     //var entrada = (document.getElementById("txtEntrada") as HTMLInputElement).value;
     
     let ast:AST = parser.parse(this.entrada);
+    this.astR = parser.parse(this.entrada);
     let tabla:Tabla= new Tabla(null);
     
     ast.instrucciones.map((m) =>{
@@ -95,28 +101,23 @@ export class PaginaComponent implements OnInit {
     this.ast = ast;
     this.tabla = tabla;
 
-    let root:Nodo = new Nodo("root", null, []);
-    let b:Nodo = root;
-    for (let index = 0; index < 10; index++) {
-      let c = new Nodo("Pto", b, []);
-      b.children.push(c);
-      b = c;
-    }
-
-    this.root = root;
   }
 
-  root = null;
   vast = true;
   verAST(){
     var tree = document.getElementById('ast');
-    if(this.vast && this.root != null){
-      generateTree([this.root]);
+    
+    if(this.vast && this.astR != null){
+      let n = new graficarAST(this.astR);
+      let m:Nodo = n.root;
+      generateTree([m]);
       tree.setAttribute('class','card-group p-5 visible');
       this.vast = false;
     }else{
       tree.setAttribute('class','card-group p-5 invisible');
-      document.getElementById("todoTree").innerHTML = "";
+      document.getElementById("grafo").setAttribute('width','0');
+      document.getElementById("grafo").setAttribute('height','0');
+      document.getElementById("grafo").innerHTML = "";
       this.vast = true;
     }
   }
@@ -135,11 +136,11 @@ export class PaginaComponent implements OnInit {
         tr += "</tr>";
         document.getElementById("infoTabla").innerHTML += tr ;
       }
-      tree.setAttribute('class','card-group p-5 visible');
+      tree.setAttribute('class','card-group visible');
       this.verrores = false;
     }else{
       document.getElementById("infoTabla").innerHTML = "" ;
-      tree.setAttribute('class','card-group p-5 invisible');
+      tree.setAttribute('class','card-group invisible');
       this.verrores = true;
     }
   }
@@ -148,25 +149,9 @@ export class PaginaComponent implements OnInit {
     let ast:AST = parser.parse(this.entrada);
 
     for(let i = 0; i < ast.instrucciones.length; i++){
-      this.analizar(ast.instrucciones[i]);
+      //this.analizar(ast.instrucciones[i]);
     }
   }
 
-  analizar(m:NodoAST){
-
-  }
-
 }
 
-class Nodo{
-  name:String;
-  parent:Nodo;
-  children:Nodo[];
-
-  constructor(name:string, parent:Nodo, children:Nodo[]){
-    this.name = name;
-    this.parent = parent;
-    this.children = children;
-  }
-
-}

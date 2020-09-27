@@ -144,4 +144,12 @@ export class Declaracion extends NodoAST {
 
         return retorno;
     }
+
+    getConstante(){
+        if(this.constante){
+            return "const";
+        }else{
+            return "let";
+        }
+    };
 }
