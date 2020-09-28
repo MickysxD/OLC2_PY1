@@ -2286,6 +2286,13 @@ class UsoFuncion extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
     ejecutar(tabla, ast) {
         const nuevoEntorno = new _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](tabla);
         let nombre = "function_" + this.identificador;
+        if (UsoFuncion.global == null) {
+            let temp = tabla;
+            while (tabla.anterior != null) {
+                temp = tabla.anterior;
+            }
+            UsoFuncion.global = temp;
+        }
         for (let i = 0; i < this.parametros.length; i++) {
             let m = this.parametros[i];
             const result = m.ejecutar(tabla, ast);
@@ -2295,7 +2302,7 @@ class UsoFuncion extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             nombre += '_' + m.tipo.tipo;
         }
         let variable;
-        variable = tabla.getVariable(nombre);
+        variable = UsoFuncion.global.getVariable(nombre);
         if (variable == null) {
             const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]("Semantico", "No se ha encontrado la funcion " + this.identificador, this.fila, this.columna);
             ast.errores.push(error);
