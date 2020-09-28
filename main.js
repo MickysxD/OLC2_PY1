@@ -533,7 +533,7 @@ class For extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             return error;
         }
         let enciclado = 0;
-        for (let index = 0; index <= 5000; index++) {
+        for (let index = 0; index <= 10000; index++) {
             const nuevoEntorno = new _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](entorno);
             let result;
             result = this.condicion.ejecutar(entorno, ast);
@@ -551,7 +551,7 @@ class For extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
                     let m = this.sentencias[i];
                     const res = m.ejecutar(nuevoEntorno, ast);
                     if (res instanceof _Expresion_Continue__WEBPACK_IMPORTED_MODULE_4__["Continue"] || res instanceof _Expresion_Break__WEBPACK_IMPORTED_MODULE_5__["Break"] || res instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]) {
-                        index = 5000;
+                        index = 10000;
                         return res;
                     }
                 }
@@ -562,7 +562,7 @@ class For extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             this.iterador.ejecutar(entorno, ast);
             enciclado = index;
         }
-        if (enciclado == 5000) {
+        if (enciclado == 10000) {
             const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]("Semantico", "Se ha enciclado la sentencia for", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
@@ -3460,11 +3460,15 @@ class PaginaComponent {
             }
         });
         console.log(tabla);
-        ast.instrucciones.map((m) => {
-            if (!(m instanceof _Ejecucion_Instruccion_Declaracion__WEBPACK_IMPORTED_MODULE_2__["Declaracion"]) && !(m instanceof _Ejecucion_Instruccion_Funcion__WEBPACK_IMPORTED_MODULE_3__["Funcion"])) {
-                m.ejecutar(tabla, ast);
-            }
-        });
+        try {
+            ast.instrucciones.map((m) => {
+                if (!(m instanceof _Ejecucion_Instruccion_Declaracion__WEBPACK_IMPORTED_MODULE_2__["Declaracion"]) && !(m instanceof _Ejecucion_Instruccion_Funcion__WEBPACK_IMPORTED_MODULE_3__["Funcion"])) {
+                    m.ejecutar(tabla, ast);
+                }
+            });
+        }
+        catch (error) {
+        }
         console.log(ast);
         let a = "";
         ast.consola.map((m) => {
@@ -3682,7 +3686,7 @@ class While extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
     }
     ejecutar(tabla, ast) {
         let enciclado = 0;
-        for (let index = 0; index <= 5000; index++) {
+        for (let index = 0; index <= 10000; index++) {
             const nuevoEntorno = new _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](tabla);
             let result;
             result = this.condicion.ejecutar(nuevoEntorno, ast);
@@ -3700,7 +3704,7 @@ class While extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
                     let m = this.sentencias[i];
                     const res = m.ejecutar(nuevoEntorno, ast);
                     if (res instanceof _Expresion_Continue__WEBPACK_IMPORTED_MODULE_4__["Continue"] || res instanceof _Expresion_Break__WEBPACK_IMPORTED_MODULE_5__["Break"] || res instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"] || res instanceof _Expresion_Return__WEBPACK_IMPORTED_MODULE_6__["Return"]) {
-                        index = 5000;
+                        index = 10000;
                         return res;
                     }
                     if (m instanceof _Expresion_Return__WEBPACK_IMPORTED_MODULE_6__["Return"]) {
@@ -3713,7 +3717,7 @@ class While extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             }
             enciclado = index;
         }
-        if (enciclado == 5000) {
+        if (enciclado == 10000) {
             const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]("Semantico", "Se ha enciclado la sentencia While", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
@@ -3990,13 +3994,13 @@ class DoWhile extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
     }
     ejecutar(tabla, ast) {
         let enciclado = 0;
-        for (let index = 0; index <= 5000; index++) {
+        for (let index = 0; index <= 10000; index++) {
             const nuevoEntorno = new _AST_Tabla__WEBPACK_IMPORTED_MODULE_1__["Tabla"](tabla);
             for (let i = 0; i < this.sentencias.length; i++) {
                 let m = this.sentencias[i];
                 const res = m.ejecutar(nuevoEntorno, ast);
                 if (res instanceof _Expresion_Continue__WEBPACK_IMPORTED_MODULE_4__["Continue"] || res instanceof _Expresion_Break__WEBPACK_IMPORTED_MODULE_5__["Break"] || res instanceof _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]) {
-                    index = 5000;
+                    index = 10000;
                     return res;
                 }
             }
@@ -4016,7 +4020,7 @@ class DoWhile extends _AST_NodoAST__WEBPACK_IMPORTED_MODULE_0__["NodoAST"] {
             }
             enciclado = index;
         }
-        if (enciclado == 5000) {
+        if (enciclado == 10000) {
             const error = new _AST_Error__WEBPACK_IMPORTED_MODULE_2__["Error"]("Semantico", "Se ha enciclado la sentencia Do While", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
