@@ -7,7 +7,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\Proyecto1\src\polyfills.ts */"hN/g");
+module.exports = __webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\proyecto1\src\polyfills.ts */"hN/g");
 
 
 /***/ }),

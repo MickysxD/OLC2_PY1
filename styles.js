@@ -7,8 +7,8 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\Proyecto1\node_modules\bootstrap\dist\css\bootstrap.min.css */"q4sD");
-module.exports = __webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\Proyecto1\src\styles.css */"OmL/");
+__webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\proyecto1\node_modules\bootstrap\dist\css\bootstrap.min.css */"q4sD");
+module.exports = __webpack_require__(/*! C:\Users\Micky\Documents\CodeBlocks.git\OLC2_PY1\proyecto1\src\styles.css */"OmL/");
 
 
 /***/ }),
