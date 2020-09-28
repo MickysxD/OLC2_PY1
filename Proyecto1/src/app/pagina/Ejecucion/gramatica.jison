@@ -210,7 +210,7 @@ INSTRUCCION: CONSOLE                        {$$ = $1;}
            | USOFUNCION ';'                 {$$ = $1;}
            | COMENTARIO                     {}
            | GRAFICAR ';'                   {$$ =$1;}
-           /*| ERROR                        {$$ = $1;}*/
+           | ERROR                          {$$ = $1;}
 ;
 
 //Graficar entornos
