@@ -23,4 +23,12 @@ export class Simbolo{
         this.valor = valor;
         this.constante = constante;
     }
+
+    getconstante(){
+        if(this.constante){
+            return "const"
+        }else{
+            return "let"
+        }
+    }
 }

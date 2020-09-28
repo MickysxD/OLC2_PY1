@@ -29,6 +29,10 @@ import { Case } from './Instruccion/Case';
 import { Ternario } from './Instruccion/Ternario';
 import { Funcion } from './Instruccion/Funcion';
 import { UsoFuncion } from './Instruccion/UsoFuncion';
+import { graficar_ts } from './Instruccion/graficar_ts';
+
+
+
 import { relative } from 'path';
 import { ParsedEvent } from '@angular/compiler';
 
@@ -92,11 +96,18 @@ export class graficarAST{
       }else if(m instanceof UsoFuncion){
         padre.children.push(this.usofuncion(m));
         
+      }else if(m instanceof graficar_ts){
+        padre.children.push(this.graficar_ts(m));
+        
       }
   
       return padre;
     }
 
+    graficar_ts(m:graficar_ts){
+      let padre = new Nodo("graficar_ts", null, []);
+      return padre;
+    }
     
     usofuncion(m:UsoFuncion){
       let padre = new Nodo("Uso de funcion "+m.identificador, null, []);

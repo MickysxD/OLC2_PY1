@@ -33,6 +33,7 @@
     var {Ternario} = require("./Instruccion/Ternario");
     var {Funcion} = require("./Instruccion/Funcion");
     var {UsoFuncion} = require("./Instruccion/UsoFuncion");
+    var {graficar_ts} = require("./Instruccion/graficar_ts");
 
 
     var errores = [];
@@ -208,7 +209,12 @@ INSTRUCCION: CONSOLE                        {$$ = $1;}
            | FUNCION                        {$$ = $1;}
            | USOFUNCION ';'                 {$$ = $1;}
            | COMENTARIO                     {}
+           | GRAFICAR ';'                   {$$ =$1;}
            /*| ERROR                        {$$ = $1;}*/
+;
+
+//Graficar entornos
+GRAFICAR: TK_GRAFICAR                       {$$ = new graficar_ts(@1.first_line, @1.first_column);}
 ;
 
 //Comentarios

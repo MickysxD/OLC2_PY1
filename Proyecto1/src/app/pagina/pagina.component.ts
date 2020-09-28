@@ -31,12 +31,10 @@ import { Case } from './Ejecucion/Instruccion/Case';
 import { Ternario } from './Ejecucion/Instruccion/Ternario';
 import { Funcion } from './Ejecucion/Instruccion/Funcion';
 import { UsoFuncion } from './Ejecucion/Instruccion/UsoFuncion';
+import { graficar_ts } from './Ejecucion/Instruccion/graficar_ts';
 
 //Funciones extra
 import { graficarAST,Nodo } from "./Ejecucion/graficarAST";
-
-import { stringify } from 'querystring';
-
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { PdfMakeWrapper, Table, Txt } from 'pdfmake-wrapper';
 import pdfMake from "pdfmake/build/pdfmake";
@@ -44,6 +42,9 @@ import pdfMake from "pdfmake/build/pdfmake";
 //Analizador
 var parser  = require("./Ejecucion/gramatica.js");
 declare var generateTree;
+
+
+import { stringify } from 'querystring';
 
 @Component({
   selector: 'app-pagina',
@@ -148,6 +149,19 @@ export class PaginaComponent implements OnInit {
       document.getElementById("infoTabla").innerHTML = "" ;
       tree.setAttribute('class','card-group invisible');
       this.verrores = true;
+    }
+  }
+
+  verent = true;
+  verEntornos(){
+    var tree = document.getElementById('ambitos');
+    if(this.verent){
+      tree.setAttribute('class','card-group bg-transparent visible');
+      this.verent = false;
+    }else{
+      document.getElementById("tablaambitos").innerHTML = "" ;
+      tree.setAttribute('class','card-group bg-transparent invisible');
+      this.verent = true;
     }
   }
 
