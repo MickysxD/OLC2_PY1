@@ -59,4 +59,15 @@ export class Ternario extends NodoAST {
         }
 
     }
+
+    traducir(tab:string, ast:AST){
+        let cadena = tab;
+        cadena += this.condicion.traducir(tab, ast);
+        cadena += "? ";
+        cadena = this.primero.traducir(tab, ast);
+        cadena += ": ";
+        cadena += this.segundo.traducir(tab, ast);
+        cadena += ";\n"
+        return cadena;
+    }
 }

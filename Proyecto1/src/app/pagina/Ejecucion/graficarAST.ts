@@ -110,11 +110,15 @@ export class graficarAST{
     }
     
     usofuncion(m:UsoFuncion){
-      let padre = new Nodo("Uso de funcion "+m.identificador, null, []);
+      let padre = new Nodo("Uso de funcion", null, []);
       
-      let lista = new Nodo("Parametros", padre, []);
+      padre.children.push(new Nodo("Identificador", null, [new Nodo(m.identificador, null, [])]));
+      
+      let lista = new Nodo("Lista de parametros", padre, []);
       m.parametros.map((p) => {
-        lista.children.push(this.valor(p));
+        let parametro = new Nodo("Parametro", padre, []);
+        parametro.children.push(this.valor(p));
+        lista.children.push(parametro);
       });
       padre.children.push(lista);
 

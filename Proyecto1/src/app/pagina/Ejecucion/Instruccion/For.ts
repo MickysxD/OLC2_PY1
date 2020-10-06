@@ -7,6 +7,7 @@ import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
 import { Declaracion } from './Declaracion';
 import { Asignacion } from './Asignacion';
+import { UsoFuncion } from './UsoFuncion';
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -47,7 +48,7 @@ export class For extends NodoAST {
         }
 
         let enciclado = 0;
-        for (let index = 0; index <= 5000; index++){
+        for (let index = 0; index <= 10000; index++){
             const nuevoEntorno = new Tabla(entorno);
 
             let result:NodoAST;
@@ -68,7 +69,7 @@ export class For extends NodoAST {
                     let m = this.sentencias[i];
                     const res = m.ejecutar(nuevoEntorno, ast);
                     if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                        index = 5000;
+                        index = 10000;
                         return res;
                     }
                 }
@@ -81,7 +82,7 @@ export class For extends NodoAST {
             enciclado = index;
         }
 
-        if(enciclado == 5000){
+        if(enciclado == 10000){
             const error = new Error("Semantico", "Se ha enciclado la sentencia for", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
@@ -89,5 +90,28 @@ export class For extends NodoAST {
         }else{
             return null;
         }
+    }
+
+    traducir(tab:string, ast:AST){
+        let cadena = tab + "for(";
+
+        cadena += this.comienzo.traducir(tab, ast);
+        cadena += "; " + this.condicion.traducir(tab, ast);
+        cadena += "; " + this.iterador.traducir(tab, ast) + "){\n";
+
+        for(let i = 0; i < this.sentencias.length; i++){
+            let m = this.sentencias[i];
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += tab + "  ";
+            }
+            cadena += m.traducir(tab+"  ", ast);
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += ";\n";
+            }
+        }
+
+        cadena += tab + "}\n\n";
+
+        return cadena;
     }
 }

@@ -31,4 +31,10 @@ export class ConsoleLog extends NodoAST{
         }
         return null;
     }
+
+    traducir(tab:string, ast:AST){
+        const value = this.expresion.traducir(tab, ast);
+        
+        return tab + "console.log(" + value + ");\n";
+    }
 }

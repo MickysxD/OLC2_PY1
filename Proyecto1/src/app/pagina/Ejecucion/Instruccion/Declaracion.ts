@@ -147,9 +147,30 @@ export class Declaracion extends NodoAST {
 
     getConstante(){
         if(this.constante){
-            return "const";
+            return "const ";
         }else{
-            return "let";
+            return "let ";
         }
-    };
+    }
+
+    traducir(tab:string, ast:AST) {
+        let cadena = this.getConstante();
+        let bandera = true;
+
+        this.declaraciones.map((m:Identificador) =>{
+            if(bandera){
+                cadena += m.traducir(tab, ast);
+                bandera = false;
+            }else{
+                cadena += ", " + m.traducir(tab, ast);
+            }
+
+            if(m.tipo != null){
+                cadena += ":" + m.tipo.toString();
+            }
+
+        });
+
+        return cadena;
+    }
 }

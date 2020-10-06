@@ -36,5 +36,14 @@ export class Return extends NodoAST {
         return null;
     }
 
+    traducir(tab:string, ast:AST){
+        if(this.valor != null){
+            const result = this.valor.traducir(tab, ast);
+            
+            return tab + "return " + result + ";";
+        }
+
+        return tab + "return;\n";
+    }
 
 }

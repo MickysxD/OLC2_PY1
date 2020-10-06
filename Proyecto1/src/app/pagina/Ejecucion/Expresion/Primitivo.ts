@@ -31,4 +31,11 @@ export class Primitivo extends NodoAST{
     ejecutar(tabla:Tabla, ast:AST) {
         return this.valor;
     }
+
+    traducir(tab:string, ast:AST) {
+        if(this.tipo.tipo == Tipos.STRING){
+            return "\"" + this.valor + "\"";
+        }
+        return this.valor;
+    }
 }

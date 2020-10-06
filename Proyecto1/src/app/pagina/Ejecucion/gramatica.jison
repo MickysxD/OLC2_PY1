@@ -34,6 +34,8 @@
     var {Funcion} = require("./Instruccion/Funcion");
     var {UsoFuncion} = require("./Instruccion/UsoFuncion");
     var {graficar_ts} = require("./Instruccion/graficar_ts");
+    var {Type} = require("./Instruccion/Type");
+    var {TypeDeclaracion} = require("./Instruccion/TypeDeclaracion");
 
 
     var errores = [];
@@ -56,7 +58,7 @@
 "boolean"                       return 'TK_BOOLEAN';
 "void"                          return 'TK_VOID';
 "Array"                         return 'TK_ARRAY';
-"type"                          return 'TK_ARRAY';
+"type"                          return 'TK_TYPE';
 
 
 //Tipos de operadores
@@ -208,6 +210,8 @@ INSTRUCCION: CONSOLE                        {$$ = $1;}
            | TERNARIO ';'                   {$$ = $1;}
            | FUNCION                        {$$ = $1;}
            | USOFUNCION ';'                 {$$ = $1;}
+           | TYPE                           {$$ = $1;}
+           | DECLARACION_TYPE               {$$ = $1;}
            | COMENTARIO                     {}
            | GRAFICAR ';'                   {$$ =$1;}
            | ERROR                          {$$ = $1;}
@@ -256,8 +260,29 @@ ID_DECLARACION: TK_ID ':' TIPO '=' EXPRESION			     {$$ = new Identificador($1, 
 ;
 
 
+//Inicializacion de types
+TYPE: TK_TYPE TK_ID '=' '{' LISTA_PARAMETROS '}' ';'         {$$ = new Type($2, $5, @1.first_line, @1.first_column);}
+;
+
+
+//Declaracion de types
+DECLARACION_TYPE: TK_CONST TK_ID ':' TK_ID '=' '{' LISTA_TYPE '}' ';'         {$$ = new TypeDeclaracion($2, $4, $7, true, @1.first_line, @1.first_column);}
+                | TK_LET TK_ID ':' TK_ID '=' '{' LISTA_TYPE '}' ';'           {$$ = new TypeDeclaracion($2, $4, $7, false, @1.first_line, @1.first_column);}
+;
+
+LISTA_TYPE: LISTA_TYPE ',' ID_TYPE           {$$ = $1; $$.push($3);}
+          | ID_TYPE                          {$$ = [$1];}
+;
+
+ID_TYPE: TK_ID ':' EXPRESION			     {$$ = new Identificador($1, null, $3, @1.first_line, @1.first_column);}
+;
+
+
+//Asigancion types
+/*ASIGNACION_TYPE: TK_ID '.' TK_ID '=' EXPRESION ';'           {$$ = new TypeAsignacion($1, $3, $5, @1.first_line, @1.first_column);}
+*/
 //Asignacion y su listado
-ASIGNACION: LISTA_ASIGNACION                             {$$ = new Asignacion($1, @1.first_line, @1.first_column);}
+ASIGNACION: LISTA_ASIGNACION                                 {$$ = new Asignacion($1, @1.first_line, @1.first_column);}
 ;
 
 LISTA_ASIGNACION: LISTA_ASIGNACION ',' ID_ASIGNACION         {$$ = $1; $$.push($2);}
@@ -338,8 +363,9 @@ LISTA_PARAMETROS: LISTA_PARAMETROS ',' PARAMETRO            {$$ = $1; $$.push($3
                 | PARAMETRO                                 {$$ = [$1];}
 ;
 
-PARAMETRO: TK_ID ':' TIPO                                     {$$ = new Identificador($1, $3, null, @1.first_line, @1.first_column);}
+PARAMETRO: TK_ID ':' TIPO                                   {$$ = new Identificador($1, $3, null, @1.first_line, @1.first_column);}
 ;
+
 
 //UsoFuncion
 USOFUNCION: TK_ID '(' LISTA_IDS ')'                      {$$ = new UsoFuncion($1, $3, @1.first_line, @1.first_column);}
@@ -356,6 +382,7 @@ TIPO: TK_STRING                                  {$$ = new Tipo(Tipos.STRING);}
     | TK_BOOLEAN                                 {$$ = new Tipo(Tipos.BOOLEAN);}
     | TK_NUMBER                                  {$$ = new Tipo(Tipos.NUMBER);}
     | TK_VOID                                    {$$ = new Tipo(Tipos.VOID);}
+    /*| TK_ID                                      {$$ = new Identificador($1, null, null, @1.first_line, @1.first_column);}*/
 ;
 
 

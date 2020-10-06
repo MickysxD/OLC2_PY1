@@ -6,6 +6,9 @@ import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
 import { Return } from "../Expresion/Return";
+import { UsoFuncion } from './UsoFuncion';
+import { Declaracion } from './Declaracion';
+import { Asignacion } from './Asignacion';
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -99,4 +102,65 @@ export class If extends NodoAST {
 
         return null;
     }
+
+    traducir(tab:string, ast:AST){
+        let cadena = tab + "if(";
+
+        cadena += this.condicion.traducir(tab, ast);
+
+        cadena += "){\n";
+
+        for(let i = 0; i < this.sentenciasIF.length; i++){
+            let m = this.sentenciasIF[i];
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += tab + "  ";
+            }
+            cadena += m.traducir(tab+"  ", ast);
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += ";\n";
+            }
+
+        }
+        
+        cadena += tab + "}"
+
+        for(let i = 0; i < this.listaIFS.length; i++){
+            let m = this.listaIFS[i];
+            if(m instanceof If){
+                cadena += "else if("+m.condicion.traducir(tab, ast);
+                cadena += "){\n"
+                for(let i = 0; i < m.sentenciasIF.length; i++){
+                    let p = m.sentenciasIF[i];
+                    if(p instanceof Declaracion || p instanceof Asignacion || p instanceof UsoFuncion){
+                        cadena += tab + "  ";
+                    }
+                    cadena += p.traducir(tab+"  ", ast);
+                    if(m instanceof Declaracion || p instanceof Asignacion || p instanceof UsoFuncion){
+                        cadena += ";\n";
+                    }
+                }
+                cadena += tab + "}"
+                
+            }
+        }
+        
+        if(this.sentenciasELSE.length > 0){
+            cadena += "else{\n"
+            for(let i = 0; i < this.sentenciasELSE.length; i++){
+                let m = this.sentenciasELSE[i];
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += tab + "  ";
+                }
+                cadena += m.traducir(tab+"  ", ast);
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += ";\n";
+                }
+            }
+            cadena += tab + "}"
+        }
+        
+        cadena += "\n\n"
+        
+        return cadena;
+    }c
 }

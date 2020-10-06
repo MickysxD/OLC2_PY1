@@ -90,4 +90,29 @@ import { Return } from './Return';
             
         }
     }
+
+    traducir(tab:string, ast: AST) {
+        if (this.derecho != null) {
+            const LeftResult = this.izquierdo.traducir(tab, ast);
+
+            const RightResult = this.derecho.traducir(tab, ast);
+
+            if (this.operador == '||') {
+                return LeftResult + " || " + RightResult;
+                    
+            } else if (this.operador == '&&') {
+                return LeftResult + " && " + RightResult;
+                    
+            }
+
+        } else {
+            const LeftResult = this.izquierdo.traducir(tab, ast);
+
+            if (this.operador == '!') {
+                return "!" + LeftResult;
+                    
+            }
+            
+        }
+    }
 }

@@ -32,6 +32,8 @@ import { Ternario } from './Ejecucion/Instruccion/Ternario';
 import { Funcion } from './Ejecucion/Instruccion/Funcion';
 import { UsoFuncion } from './Ejecucion/Instruccion/UsoFuncion';
 import { graficar_ts } from './Ejecucion/Instruccion/graficar_ts';
+import { Type } from './Ejecucion/Instruccion/Type';
+import { TypeDeclaracion } from './Ejecucion/Instruccion/TypeDeclaracion';
 
 //Funciones extra
 import { graficarAST,Nodo } from "./Ejecucion/graficarAST";
@@ -70,7 +72,7 @@ export class PaginaComponent implements OnInit {
   
 
   //aqui va todo el codigo xd
-  exec(){
+  ejecutar(){
     //var entrada = (document.getElementById("txtEntrada") as HTMLInputElement).value;
     
     let ast:AST = parser.parse(this.entrada);
@@ -78,19 +80,29 @@ export class PaginaComponent implements OnInit {
     let tabla:Tabla= new Tabla(null);
     
     ast.instrucciones.map((m) =>{
-      if(m instanceof Declaracion || m instanceof Funcion){
+      if(m instanceof Funcion || m instanceof Type){
+        m.ejecutar(tabla, ast);
+      }
+    });
+
+    ast.instrucciones.map((m) =>{
+      if(m instanceof Declaracion || m instanceof TypeDeclaracion){
         m.ejecutar(tabla, ast);
       }
     });
 
     console.log(tabla);
 
-    ast.instrucciones.map((m) =>{
-      if(!(m instanceof Declaracion) && !(m instanceof Funcion)){
-        m.ejecutar(tabla, ast);
-      }
-    });
-
+    try {
+      ast.instrucciones.map((m) =>{
+        if(!(m instanceof Declaracion) && !(m instanceof Funcion) && !(m instanceof Type) && !(m instanceof TypeDeclaracion)){
+          m.ejecutar(tabla, ast);
+        }
+      });
+    } catch (error) {
+      
+    }
+    
     console.log(ast);
 
     let a:string = "";
@@ -168,9 +180,22 @@ export class PaginaComponent implements OnInit {
   traducir(){
     let ast:AST = parser.parse(this.entrada);
 
-    for(let i = 0; i < ast.instrucciones.length; i++){
-      //this.analizar(ast.instrucciones[i]);
+    for(let i = 0; i<ast.instrucciones.length; i++){
+      let m = ast.instrucciones[i];
+      let cadena = "";
+      cadena += m.traducir("", ast);
+      if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+          cadena += ";\n";
+      }
+      ast.consola.push(cadena);
     }
+
+    let a:string = "";
+    ast.consola.map((m) =>{
+      a += m;
+    });
+
+    this.salida = a;
   }
 
 }

@@ -21,4 +21,8 @@ export class Continue extends NodoAST {
     ejecutar(tabla:Tabla, ast:AST){
         return this;
     }
+
+    traducir(tab:string, ast:AST){
+        return tab + "continue;\n";
+    }
 }

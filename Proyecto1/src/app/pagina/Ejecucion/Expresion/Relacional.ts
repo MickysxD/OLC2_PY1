@@ -112,4 +112,31 @@ export class Relacional extends NodoAST {
         }
 
     }
+
+    traducir(tab:string, ast:AST) {
+        const LeftResult = this.izquierdo.traducir(tab, ast);
+
+        const RightResult = this.derecho.traducir(tab, ast);
+
+        if (this.operador == '<') {
+                return LeftResult + "<" + RightResult;
+
+        } else if (this.operador == '>') {
+                return LeftResult + ">" + RightResult;
+                
+        } else if (this.operador == '>=') {
+                return LeftResult + ">=" + RightResult;
+
+        } else if (this.operador == '<=') {
+                return LeftResult + "<=" + RightResult;
+                
+        } else if (this.operador == '!=') {
+                return LeftResult + "!=" + RightResult;
+                
+        } else if (this.operador == '==') {
+                return LeftResult + "==" + RightResult;
+                
+        }
+
+    }
 }

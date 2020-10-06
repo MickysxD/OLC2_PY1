@@ -23,6 +23,10 @@ export class graficar_ts extends NodoAST{
         return null;
     };
 
+    traducir(tab:string, ast:AST){
+        return "graficar_ts;\n";
+    };
+
 /*
     generarPDF() {
         const pdf = new PdfMakeWrapper();

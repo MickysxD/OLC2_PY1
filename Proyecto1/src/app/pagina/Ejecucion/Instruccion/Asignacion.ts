@@ -68,4 +68,20 @@ export class Asignacion extends NodoAST {
         
         return retorno;
     }
+
+    traducir(tab:string, ast:AST) {
+        let bandera = true;
+        let cadena = "";
+        this.asignaciones.map((m:Identificador) =>{
+            if(bandera){
+                cadena += m.traducir(tab, ast);
+                bandera = false;
+            }else{
+                cadena += ", " + m.traducir(tab, ast);
+            }
+            
+        });
+
+        return cadena;
+    }
 }

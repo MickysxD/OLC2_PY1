@@ -16,6 +16,7 @@ export class UsoFuncion extends NodoAST {
     identificador:string;
     parametros:NodoAST[];
     valor:NodoAST;
+    static global:Tabla;
 
     /**
      * @constructor Crea el nodo instruccion para la sentencia Asignacion
@@ -36,6 +37,14 @@ export class UsoFuncion extends NodoAST {
         const nuevoEntorno = new Tabla(tabla);
         let nombre = "function_"+this.identificador;
 
+        if(UsoFuncion.global == null){
+            let temp = tabla;
+            while (temp.anterior != null) {
+                temp = temp.anterior;
+            }
+            UsoFuncion.global = temp;
+        }
+
         for(let i = 0; i < this.parametros.length; i++){
             let m = this.parametros[i];
             const result = m.ejecutar(tabla, ast);
@@ -46,7 +55,7 @@ export class UsoFuncion extends NodoAST {
         }
 
         let variable:Simbolo;
-        variable = tabla.getVariable(nombre);
+        variable = UsoFuncion.global.getVariable(nombre);
         if (variable == null) {
             const error = new Error("Semantico","No se ha encontrado la funcion " + this.identificador, this.fila, this.columna);
             ast.errores.push(error);
@@ -118,5 +127,33 @@ export class UsoFuncion extends NodoAST {
         }
 
         return null;
+    }
+
+    traducir(tab:string, ast:AST) {
+        for(let i = 0; i < ast.instrucciones.length; i++){
+            let m = ast.instrucciones[i];
+            if(m instanceof Funcion){
+                if(m.real == this.identificador){
+                    this.identificador = m.identificador;
+                }
+            }
+        }
+
+        let cadena = this.identificador + "(";
+        let bandera = true;
+
+        for(let i = 0; i < this.parametros.length; i++){
+            let m = this.parametros[i];
+            const result = m.traducir(tab, ast);
+            if(bandera){
+                cadena += result;
+            }else{
+                cadena += ", " + result;
+            }
+        }
+
+        cadena += ")"
+
+        return cadena;
     }
 }

@@ -6,6 +6,9 @@ import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
 import { Return } from "../Expresion/Return";
+import { UsoFuncion } from './UsoFuncion';
+import { Declaracion } from './Declaracion';
+import { Asignacion } from './Asignacion';
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -47,5 +50,23 @@ export class Case extends NodoAST {
         }
 
         return null;
+    }
+
+    traducir(tab:string, ast:AST){
+        let cadena = "";
+        for(let i = 0; i < this.sentencias.length; i++){
+            let m = this.sentencias[i];
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += tab;
+            }
+            cadena += m.traducir(tab, ast);
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += ";\n";
+            }
+        }
+
+        cadena += "\n";
+
+        return cadena;
     }
 }

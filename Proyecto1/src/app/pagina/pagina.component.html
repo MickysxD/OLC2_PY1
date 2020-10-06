@@ -13,7 +13,7 @@
             <ngx-codemirror [(ngModel)]="entrada" [options]="{ lineNumbers: true, theme: '3024-night', mode: 'javascript'}">
             </ngx-codemirror>
         </div>
-        <button _ngcontent-srk-c16="" (click)="exec()" type="button" id="btnEjecutar" class="btn p-2 mb-1 btn-outline-success btn-lg bg-warning text-light">Ejecutar</button>
+        <button _ngcontent-srk-c16="" (click)="ejecutar()" type="button" id="btnEjecutar" class="btn p-2 mb-1 btn-outline-success btn-lg bg-warning text-light">Ejecutar</button>
         <button _ngcontent-srk-c16="" (click)="traducir()" type="button" id="tbnTraducir" class="btn p-2 mb-1 btn-outline-success btn-lg bg-info text-light">Traducir</button>
     </div>
     <div _ngcontent-srk-c16="" class="card bg-danger">
@@ -24,7 +24,7 @@
         </div>
         <button _ngcontent-srk-c16="" (click)="verAST()" type="button" id="btnAST" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-primary text-light">AST</button>
         <button _ngcontent-srk-c16="" (click)="verErrores()" type="button" id="btnErrores" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Errores</button>
-        <button _ngcontent-srk-c16="" (click)="verEntornos()" type="button" id="btnEntorno" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-secondary text-light">Entornos</button>
+        <button _ngcontent-srk-c16="" (click)="verEntornos()" type="button" id="btnEntorno" class="btn p-2 mb-1 btn-outline-danger btn-lg bg-success text-light">Entornos</button>
     </div>
 </div>
 
@@ -54,7 +54,7 @@
     </div>
 </div>
 
-<div class="card-group bg-transparent invisible"  role="group">
+<div class="card-group bg-transparent"  role="group">
 
 </div>
 
@@ -66,6 +66,6 @@
 
 <div class="card-group p-5 invisible" role="group" id="ast">
     <div _ngcontent-srk-c16="" class="card bg-transparent">
-        <svg id="todoTree"></svg>
+        <svg></svg>
     </div>
 </div>

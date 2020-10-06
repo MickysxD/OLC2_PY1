@@ -21,4 +21,8 @@ export class Break extends NodoAST {
     ejecutar(tabla:Tabla, ast:AST){
         return this;
     }
+
+    traducir(tab:string, ast:AST){
+        return tab + "break;\n";
+    }
 }

@@ -14,6 +14,8 @@ export abstract class NodoAST{
 
     abstract ejecutar(tabla:Tabla, ast:AST);
  
+    abstract traducir(tab:string, ast:AST);
+
     /**
      * 
      * @constructor Base para cualquier instruccion o expresion, omitir tipo si fuera una instruccion

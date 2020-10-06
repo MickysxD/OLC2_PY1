@@ -7,6 +7,9 @@ import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
 import { Case } from "./Case";
 import { Return } from "../Expresion/Return";
+import { UsoFuncion } from './UsoFuncion';
+import { Declaracion } from './Declaracion';
+import { Asignacion } from './Asignacion';
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -93,6 +96,44 @@ export class Switch extends NodoAST {
         }
 
         return null;
+        
+    }
+
+    traducir(tab:string, ast:AST){
+        let cadena = tab + "switch(";
+        cadena += this.condicion.traducir(tab, ast);
+
+        cadena += "){\n";
+
+        for(let i = 0; i < this.cases.length; i++){
+            let m = this.cases[i];
+            if(m instanceof Case && m.esDefault != true){
+                cadena += tab + "  " + "case " + m.condicion.traducir(tab, ast) + ":\n";
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += tab + "    ";
+                }
+                cadena += m.traducir(tab+"    ", ast);
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += ";\n";
+                }
+
+            }else if(m instanceof Case && m.esDefault == true){
+                cadena += tab + "  " + "default:\n";
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += tab + "    ";
+                }
+                cadena += m.traducir(tab+"    ", ast);
+                if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                    cadena += ";\n";
+                }
+                
+            }
+
+        }
+
+        cadena += "\n" + tab + "}\n\n"
+
+        return cadena;
         
     }
 }

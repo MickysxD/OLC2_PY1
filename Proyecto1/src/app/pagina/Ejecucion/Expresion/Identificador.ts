@@ -42,5 +42,13 @@ export class Identificador extends NodoAST {
         }
         this.tipo = variable.tipo;
         return variable.valor;
-   }
+    }
+
+    traducir(tab:string, ast:AST){
+        if (this.valor != null) {
+            const result = this.valor.traducir(tab, ast);
+            return this.identificador + "=" + result;
+        }
+        return this.identificador;
+    }
 }

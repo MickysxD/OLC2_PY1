@@ -5,6 +5,9 @@ import { Error } from "../AST/Error";
 import { Tipo,Tipos } from "../AST/Tipo";
 import { Continue } from "../Expresion/Continue";
 import { Break } from "../Expresion/Break";
+import { UsoFuncion } from './UsoFuncion';
+import { Declaracion } from './Declaracion';
+import { Asignacion } from './Asignacion';
 
 /**
  * @class Ejecuta una serie de instrucciones en caso la condicion sea verdadera sino ejecuta las instrucciones falsas
@@ -31,14 +34,14 @@ export class DoWhile extends NodoAST {
 
     ejecutar(tabla:Tabla, ast:AST){
         let enciclado = 0;
-        for (let index = 0; index <= 5000; index++){
+        for (let index = 0; index <= 10000; index++){
             const nuevoEntorno = new Tabla(tabla);
 
             for(let i = 0; i < this.sentencias.length; i++){
                 let m = this.sentencias[i];
                 const res = m.ejecutar(nuevoEntorno, ast);
                 if(res instanceof Continue || res instanceof Break || res instanceof Error){
-                    index = 5000;
+                    index = 10000;
                     return res;
                 }
             }
@@ -62,7 +65,7 @@ export class DoWhile extends NodoAST {
             enciclado = index;
         }
 
-        if(enciclado == 5000){
+        if(enciclado == 10000){
             const error = new Error("Semantico", "Se ha enciclado la sentencia Do While", this.fila, this.columna);
             ast.errores.push(error);
             //ast.consola.push(error.toString());
@@ -70,5 +73,30 @@ export class DoWhile extends NodoAST {
         }else{
             return null;
         }
+    }
+
+    traducir(tab:string, ast:AST){
+        let cadena = tab;
+
+        cadena += "do{\n"
+
+        for(let i = 0; i < this.sentencias.length; i++){
+            let m = this.sentencias[i];
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += tab + "  ";
+            }
+            cadena += m.traducir(tab+"  ", ast);
+            if(m instanceof Declaracion || m instanceof Asignacion || m instanceof UsoFuncion){
+                cadena += ";\n";
+            }
+        }
+
+        cadena += tab + "}while("
+
+        cadena += this.condicion.traducir(tab, ast);
+
+        cadena += ");\n\n"
+
+        return cadena;
     }
 }

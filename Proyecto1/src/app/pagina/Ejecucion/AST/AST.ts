@@ -9,6 +9,7 @@ export class AST{
     instrucciones:NodoAST[];
     errores:Error[];
     consola:string[];
+    actual:string;
 
     /**
      * Retorna un arbol con 2 atributos: 1 ast y 1 lista de excepciones
@@ -19,5 +20,6 @@ export class AST{
         this.instrucciones = instrucciones;
         this.errores = errores;
         this.consola = [];
+        this.actual = "";
     }
 }

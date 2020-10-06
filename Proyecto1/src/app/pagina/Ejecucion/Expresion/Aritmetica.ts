@@ -143,4 +143,39 @@ export class Aritmetica extends NodoAST {
             }
         }
     }
+
+    traducir(tab:string, ast:AST) {
+        if(this.derecho != null){
+            const operacionIzq = this.izquierdo.traducir(tab, ast);
+            
+            const operacionDer = this.derecho.traducir(tab, ast);
+
+            if(this.operacion == '+'){
+                return operacionIzq + "+" + operacionDer;
+
+            }else if(this.operacion == '-'){
+                return operacionIzq + "-" + operacionDer;
+
+            }else if(this.operacion == '*'){
+                    return operacionIzq + "*" + operacionDer;
+
+            }else if(this.operacion == '/'){
+                    return operacionIzq + "/" + operacionDer;
+
+            }else if(this.operacion == '^'){
+                    return operacionIzq + "**" + operacionDer;
+                    
+            }else if(this.operacion == '%'){
+                return operacionIzq + "%" + operacionDer;
+                    
+            }
+
+        }else{
+            const operacionIzq = this.izquierdo.traducir(tab, ast);
+            
+            if(this.operacion == '-'){
+                return "-" + operacionIzq;
+            }
+        }
+    }
 }
